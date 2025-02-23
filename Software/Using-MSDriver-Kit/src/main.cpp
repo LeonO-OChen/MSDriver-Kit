@@ -30,6 +30,9 @@ void setup()
     _i2c.init(I2C_SDA, I2C_SCL, I2C_FREQ);
     pinMode(PIN_LED, OUTPUT);
 
+    // 等待其它设备上电完毕
+    delay(500);
+
     initMSDriver();
 
     oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
@@ -42,8 +45,8 @@ void setup()
 
     delay(1000);
     oled.clearDisplay(); // 清屏
-    oled.setCursor(40, 16);
-    oled.println("Hello!");
+    // oled.setCursor(40, 16);
+    // oled.println("Hello!");
     oled.display(); // 显示
     oled.setTextSize(1);
     oled.setCursor(10, 20);
@@ -60,11 +63,14 @@ void loop()
         // 每隔200ms切换电机0的速度
         delay(200);
 
-        // _MSDriverMaster.getValueM(0, &speed0);
-        // _MSDriverMaster.getValueM(2, &speed2);
-        // Serial.printf("%7d %7d\n", speed0, speed2);
-        // oled.println(str);
-        // oled.display(); // 显示
+        //_MSDriverMaster.getValueM(0, &speed0);
+        //_MSDriverMaster.getValueM(2, &speed2);
+        //_i2c.ReadDataArray(0x28, M0_SPEED_RA, (uint8_t*)&speed0, 4);
+        _i2c.ReadDataArray(0x32, M0_SPEED_RA, (uint8_t *)&speed0, 4);
+
+        sprintf(str, "%7d %7d\n", speed0, speed2);
+        oled.println(str);
+        oled.display(); // 显示
 
         if (++count == 10) {
             // 每隔2s切换电机的速度

@@ -323,11 +323,17 @@ void MSDriverSlave::requestEvent()
     uint8_t *regAddrPtr = &_MSDriverSlave.regAddr;
     uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
 
-    if (*regAddrPtr <= MSD_REG_ADDR::END) {
+    while (*regAddrPtr <= MSD_REG_ADDR::END) {
         Wire.write(regPtr[*regAddrPtr]);
         (*regAddrPtr)++;
     }
 
+    // if (*regAddrPtr <= MSD_REG_ADDR::END) {
+    //     Wire.write(regPtr[*regAddrPtr]);
+    //     (*regAddrPtr)++;
+    // }
+
+    //Wire.write(0x7E);
 }
 
 /*
