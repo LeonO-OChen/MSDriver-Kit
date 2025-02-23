@@ -47,11 +47,6 @@ void MSDriverSlave::init()
     motor[2].init(PIN_M2_PWM, PIN_M2_F1, PIN_M2_F2);
     motor[3].init(PIN_M3_PWM, PIN_M3_F1, PIN_M3_F2);
 
-    motor[0].setMotor(0);
-    motor[1].setMotor(1);
-    motor[2].setMotor(2);
-    motor[3].setMotor(3);
-
     receivedCmd = false;
 }
 
@@ -122,7 +117,7 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki, float 
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
 
-        if (mode & 0x10) {
+        if (mode & 0b010000) {
             // 反向
             motor[num].setParam(-1, kp, ki, kd, kR);
         } else {
@@ -197,7 +192,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed, int32_t
 {
     // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
     if (shadowRegCtrl.speedM[num] == inSpeed) {
-        motor[num].setMotor(inSpeed);
+        motor[num].setMotorTar(inSpeed);
     }
     shadowRegCtrl.speedM[num] = inSpeed;
 
@@ -332,6 +327,7 @@ void MSDriverSlave::requestEvent()
         Wire.write(regPtr[*regAddrPtr]);
         (*regAddrPtr)++;
     }
+
 }
 
 /*

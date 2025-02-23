@@ -42,9 +42,9 @@ public:
     void enablePID(bool enbable);
     void setParam(int8_t offset, float kp, float ki, float kd, float kStandradPoint);
     void init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2);
-    void setMotor(int mspeed); // 驱动单个电机 -- mspeed:速度 -255~255
-    void setMotorPWM(int pwm); // 驱动单个电机 -- pwm:速度 -255~255
-    void execute(bool debug);  // 如需PID控制，每30ms调用此函数
+    void setMotorTar(int16_t mspeed); // 设置电机目标速度 -- mspeed:速度 -255~255
+    void setMotorPWM(int16_t pwm);    // 驱动单个电机 -- pwm:速度 -255~255
+    void execute(bool debug);         // 如需PID控制，每30ms调用此函数
 };
 
 #endif

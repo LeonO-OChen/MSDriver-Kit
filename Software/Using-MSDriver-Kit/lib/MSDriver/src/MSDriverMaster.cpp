@@ -243,18 +243,17 @@ void MSDriverMaster::setServoMode(int num, const uint8_t &mode)
 }
 
 // num(0~3), speed(-100~100)
-void MSDriverMaster::motor100(int8_t num, int speed)
+void MSDriverMaster::motor100(int8_t num, int16_t speed)
 {
     int data = speed * 255 / 100;
     motor(num, data);
 }
 
 // num(0~3), pwm(-255~255)
-void MSDriverMaster::motor(int8_t num, int pwm)
+void MSDriverMaster::motor(int8_t num, int16_t pwm)
 {
     uint8_t reg = M0_SPEED + (num << 1); // 每个值占2个字节
-    int16_t data = pwm;
-    writeReg(reg, (uint8_t *)&data, 2);
+    writeReg(reg, (uint8_t *)&pwm, 2);
 }
 
 void MSDriverMaster::motorBreak(int8_t num)
@@ -276,13 +275,13 @@ void MSDriverMaster::servo(int8_t num, uint8_t angle)
  * 获取电机的当前转速（仅在测速模式下使用）
  * 在非测速模式下，0、1字节代表引脚A的读数，2、3字节代表引脚B的读数
  */
-bool MSDriverMaster::getValueM(int num, uint32_t *val)
+bool MSDriverMaster::getValueM(int num, int32_t *val)
 {
     if (num == -1) {
-        return readReg(M0_SPEED_RA, (uint8_t *)val, sizeof(uint32_t) * 4);
+        return readReg(M0_SPEED_RA, (uint8_t *)val, sizeof(int32_t) * 4);
     } else {
-        uint8_t reg = M0_SPEED_RA + num << 2; // 数据占4字节
-        return readReg(reg, (uint8_t *)val, sizeof(uint32_t));
+        uint8_t reg = M0_SPEED_RA + (num << 2); // 数据占4字节
+        return readReg(reg, (uint8_t *)val, sizeof(int32_t));
     }
 }
 
@@ -292,7 +291,7 @@ bool MSDriverMaster::getValueM(int num, uint32_t *val)
  */
 bool MSDriverMaster::getValueMA(int num, uint16_t *val)
 {
-    uint8_t reg = M0_SPEED_RA + num << 2; // 数据占4字节
+    uint8_t reg = M0_SPEED_RA + (num << 2); // 数据占4字节
     return readReg(reg, (uint8_t *)val, sizeof(uint16_t));
 }
 
@@ -302,7 +301,7 @@ bool MSDriverMaster::getValueMA(int num, uint16_t *val)
  */
 bool MSDriverMaster::getValueMB(int num, uint16_t *val)
 {
-    uint8_t reg = M0_SPEED_RB + num << 2; // 数据占4字节
+    uint8_t reg = M0_SPEED_RB + (num << 2); // 数据占4字节
     return readReg(reg, (uint8_t *)val, sizeof(uint16_t));
 }
 
@@ -315,7 +314,7 @@ bool MSDriverMaster::getValueS(int num, uint16_t *val)
     if (num == -1) {
         return readReg(S0_ANGLE_R, (uint8_t *)val, sizeof(uint16_t) * 8);
     } else {
-        uint8_t reg = S0_ANGLE_R + num << 21; // 数据占2字节
+        uint8_t reg = S0_ANGLE_R + (num << 1); // 数据占2字节
         return readReg(reg, (uint8_t *)val, sizeof(uint16_t));
     }
 }

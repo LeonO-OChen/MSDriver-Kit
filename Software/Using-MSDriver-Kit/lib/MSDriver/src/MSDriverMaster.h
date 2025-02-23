@@ -21,14 +21,14 @@ public:
 
     void setMotorMode(int num, uint8_t &mode);
     void setMotorPID(int num, float kp, float ki, float kd, float kr);
-    void motor100(int8_t num, int speed);
-    void motor(int8_t num, int pwm);
+    void motor100(int8_t num, int16_t speed);
+    void motor(int8_t num, int16_t pwm);
     void motorBreak(int8_t num); // 刹车
 
     void setServoMode(int num, const uint8_t &mode);
     void servo(int8_t num, uint8_t angle); // num(0~3), angle(0~180)
 
-    bool getValueM(int num, uint32_t *val);
+    bool getValueM(int num, int32_t *val);
     bool getValueMA(int num, uint16_t *val);
     bool getValueMB(int num, uint16_t *val);
     bool getValueS(int num, uint16_t *val);

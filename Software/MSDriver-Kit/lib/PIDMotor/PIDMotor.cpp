@@ -37,7 +37,7 @@ void PIDMotor::init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2)
 }
 
 // 驱动电机 --mspeed:速度 -255~255
-void PIDMotor::setMotor(int mspeed)
+void PIDMotor::setMotorTar(int16_t mspeed)
 {
     bBreak = (mspeed == 0x0E0E); // 是否刹车
 
@@ -50,21 +50,18 @@ void PIDMotor::setMotor(int mspeed)
         mspeed = mspeed > 255 ? 255 : mspeed;
         mspeed = mspeed < -255 ? -255 : mspeed;
 
+        int speed = mspeed * _offset;
         if (bEnabledPID) {
-            int speed = _offset * mspeed;
             _count100msTar = _kStandradPoint * speed;
-
         } else {
             // 不进行PID控制的时候，直接设置PWM
-            setMotorPWM(mspeed);
+            setMotorPWM(speed);
         }
     }
 }
 
-void PIDMotor::setMotorPWM(int mpwm)
+void PIDMotor::setMotorPWM(int16_t pwm)
 {
-    int pwm = _offset * mpwm;
-
     // 输出方向
     if (pwm > 0) {
         // 前进
@@ -82,11 +79,12 @@ void PIDMotor::setMotorPWM(int mpwm)
     }
 
     //  输出大小
-    if (abs(pwm) < 40) {
+    int val = abs(pwm);
+    if (val < 40) {
         // _太小时带不动电机，长时间会烧坏
         analogWrite(_pinPWM, 0);
     } else {
-        analogWrite(_pinPWM, pwm);
+        analogWrite(_pinPWM, val);
     }
 }
 
