@@ -50,11 +50,11 @@ void MSDriverSlave::init()
     receivedCmd = false;
 }
 
-void MSDriverSlave::init(const MSDriverReg_MOD_t &cmd)
+void MSDriverSlave::init(const MSDriverReg_MOD_t &mod)
 {
     init();
 
-    memcpy(&reg.mode, &(cmd), sizeof(MSDriverReg_MOD_t));
+    memcpy(&reg.mode, &(mod), sizeof(MSDriverReg_MOD_t));
     memcpy(&shadowRegMod, &(reg.mode), sizeof(MSDriverReg_MOD_t));
 
     // 根据寄存器配置工作模式
@@ -70,8 +70,12 @@ void MSDriverSlave::execute()
         memcpy(&shadowRegMod, &(reg.mode), sizeof(MSDriverReg_MOD_t));
         receivedCmd = false;
 
-        // 根据寄存器配置工作模式
-        setModeByReg();
+        if (reg.cmd == APPLY) {
+            // 根据寄存器配置工作模式
+            setModeByReg();
+        } else if (reg.cmd == INIT) {
+            init();
+        }
     }
 
     // M0 ~ M3
@@ -320,20 +324,17 @@ void MSDriverSlave::receiveEvent(int howMany)
 // 主机要求读取寄存器内容
 void MSDriverSlave::requestEvent()
 {
-    uint8_t *regAddrPtr = &_MSDriverSlave.regAddr;
-    uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
-
-    while (*regAddrPtr <= MSD_REG_ADDR::END) {
-        Wire.write(regPtr[*regAddrPtr]);
-        (*regAddrPtr)++;
+    // 要求的寄存器地址超出范围
+    if (_MSDriverSlave.regAddr > MSD_REG_ADDR::END) {
+        return;
     }
 
-    // if (*regAddrPtr <= MSD_REG_ADDR::END) {
-    //     Wire.write(regPtr[*regAddrPtr]);
-    //     (*regAddrPtr)++;
-    // }
+    // 最多一次传送32字节
+    size_t len = MSD_REG_ADDR::END - _MSDriverSlave.regAddr + 1;
+    len = len > 32 ? 32 : len;
 
-    //Wire.write(0x7E);
+    uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
+    Wire.write(&regPtr[_MSDriverSlave.regAddr], len);
 }
 
 /*

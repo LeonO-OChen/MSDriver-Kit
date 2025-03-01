@@ -12,10 +12,10 @@ void MSDriverMaster::init(uint8_t addr)
 }
 
 // 发送命令，使设定生效
-void MSDriverMaster::sendCmd()
+void MSDriverMaster::sendCmd(MSD_CMD cmd)
 {
-    uint8_t cmd = 0x0E;
-    writeReg(CMD, &cmd, 1);
+    uint8_t data = cmd;
+    writeReg(CMD, &data, 1);
 }
 
 /*

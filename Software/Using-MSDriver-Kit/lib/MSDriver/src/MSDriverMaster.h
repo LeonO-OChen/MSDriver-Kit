@@ -17,7 +17,7 @@ public:
     uint8_t servoMode4567 = 0;
 
     void init(uint8_t addr = 0x32);
-    void sendCmd();
+    void sendCmd(MSD_CMD cmd);
 
     void setMotorMode(int num, uint8_t &mode);
     void setMotorPID(int num, float kp, float ki, float kd, float kr);

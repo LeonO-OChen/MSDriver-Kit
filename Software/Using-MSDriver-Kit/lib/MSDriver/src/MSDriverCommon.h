@@ -185,4 +185,10 @@ typedef struct {
     uint16_t currValueS[8];
 } MSDriverReg_FB_t;
 
+// 指令
+enum MSD_CMD {
+    INIT = 0x0E, // 00H(R/-)
+    APPLY = 0x01,  // 应用：变更电机/舵机模式
+};
+
 #endif

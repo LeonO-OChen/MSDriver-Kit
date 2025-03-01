@@ -57,18 +57,24 @@ void loop()
 {
     static char str[20];
     int32_t speed0 = 0;
+    int32_t speed1 = 0;
     int32_t speed2 = 0;
+    int32_t speed3 = 0;
     int count = 0;
     for (int i = 0; i < 20; i++) {
         // 每隔200ms切换电机0的速度
         delay(200);
 
         //_MSDriverMaster.getValueM(0, &speed0);
+        //_MSDriverMaster.getValueM(1, &speed1);
         //_MSDriverMaster.getValueM(2, &speed2);
-        //_i2c.ReadDataArray(0x28, M0_SPEED_RA, (uint8_t*)&speed0, 4);
-        _i2c.ReadDataArray(0x32, M0_SPEED_RA, (uint8_t *)&speed0, 4);
+        //_MSDriverMaster.getValueM(3, &speed3);
 
-        sprintf(str, "%7d %7d\n", speed0, speed2);
+        sprintf(str, "%7d %7d\n", speed0, speed1);
+        oled.setCursor(10, 4);
+        oled.println(str);
+        sprintf(str, "%7d %7d\n", speed2, speed3);
+        oled.setCursor(10, 20);
         oled.println(str);
         oled.display(); // 显示
 
@@ -103,7 +109,7 @@ void initMSDriver()
     _MSDriverMaster.setMotorMode(2, motorMode23); // 设置M2工作模式
     _MSDriverMaster.setMotorMode(3, motorMode23); // 设置M3工作模式
     _MSDriverMaster.setServoMode(-1, smode);      // 设置所有舵机工作模式
-    _MSDriverMaster.sendCmd();
+    _MSDriverMaster.sendCmd(APPLY);
 }
 
 // M0,M2 闭环控制
@@ -117,5 +123,5 @@ void initMSDriver2()
     _MSDriverMaster.setMotorMode(2, motorMode2);            // 设置M2工作模式
     _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.0); // 设置所有电机PID参数
     _MSDriverMaster.setServoMode(-1, smode);                // 设置所有舵机工作模式
-    _MSDriverMaster.sendCmd();
+    _MSDriverMaster.sendCmd(APPLY);
 }
