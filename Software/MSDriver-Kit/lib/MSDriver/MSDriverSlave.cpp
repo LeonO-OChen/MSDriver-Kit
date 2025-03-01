@@ -121,7 +121,7 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki, float 
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
 
-        if (mode & 0b010000) {
+        if (mode & 0b01000000) {
             // 反向
             motor[num].setParam(-1, kp, ki, kd, kR);
         } else {

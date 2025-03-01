@@ -33,7 +33,7 @@ void setup()
     // 等待其它设备上电完毕
     delay(500);
 
-    initMSDriver();
+    initMSDriver2();
 
     oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     oled.clearDisplay(); // 清屏
@@ -115,13 +115,17 @@ void initMSDriver()
 // M0,M2 闭环控制
 void initMSDriver2()
 {
-    uint8_t motorMode0 = 0b10000000; // 测速，正向，计数不自动清零，无PID控制
-    uint8_t motorMode2 = 0b10010000; // 测速，反向，计数不自动清零，无PID控制
+    uint8_t motorMode0 = 0b10001001; // 测速，正向，PID控制
+    uint8_t motorMode2 = 0b11001001; // 测速，反向，PID控制
+    
+
     uint8_t smode = 0b11;            // 舵机模式
     _MSDriverMaster.init(0x32);
     _MSDriverMaster.setMotorMode(0, motorMode0);            // 设置M0工作模式
+    _MSDriverMaster.setMotorMode(1, motorMode0);            // 设置M1工作模式
     _MSDriverMaster.setMotorMode(2, motorMode2);            // 设置M2工作模式
-    _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.0); // 设置所有电机PID参数
+    _MSDriverMaster.setMotorMode(3, motorMode2);            // 设置M3工作模式
+    _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.8); // 设置所有电机PID参数
     _MSDriverMaster.setServoMode(-1, smode);                // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);
 }
