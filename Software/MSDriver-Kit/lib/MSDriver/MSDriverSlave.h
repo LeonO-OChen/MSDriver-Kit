@@ -22,6 +22,8 @@ class MSDriverSlave
 public:
     // 是否收到指令
     bool receivedCmd = false;
+    // 是否从串口打印调试信息
+    bool _printDebug = false;
     // 寄存器
     MSDriverReg_t reg;
     // 影子寄存器——实际使用的寄存器——防止使用过程中被覆盖

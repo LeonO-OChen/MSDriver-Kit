@@ -9,7 +9,6 @@ uint8_t i2cAddr;
 String inputString = "";     // 从串口接收到的字符串
 bool stringComplete = false; // 判断有没有接收完毕
 
-void initMSDriverSlave();
 void printReadme();
 
 void setup()
@@ -26,7 +25,9 @@ void setup()
 
     // 初始化模块
     _MSDriverSlave.init();
-    // initMSDriverSlave();
+
+    // 在串口输出使用说明
+    printReadme();
 
     // 初始化I2C从机
     // 使用I2C2 (PB10,PB11引脚)
@@ -35,6 +36,7 @@ void setup()
     Wire.onReceive(MSDriverSlave::receiveEvent);
     Wire.onRequest(MSDriverSlave::requestEvent);
 
+    // 打开I2C
     if (digitalRead(PIN_LED)) {
         // 地址跳线断开时
         i2cAddr = I2C_ADD;
@@ -44,8 +46,10 @@ void setup()
     }
     Wire.begin(i2cAddr);
 
-    // 在串口输出使用说明
-    printReadme();
+    // pinMode(I2C2_SCL, OUTPUT_OPEN_DRAIN);
+    // digitalWrite(I2C2_SCL, HIGH); // 释放
+    // pinMode(I2C2_SDA, OUTPUT_OPEN_DRAIN);
+    // digitalWrite(I2C2_SDA, HIGH); // 释放
 }
 
 void loop()
@@ -69,8 +73,12 @@ void loop()
 
     // 判断是否收到PID调参指令 ==> 对M0进行PID调参
     if (stringComplete) {
+        bool isCommand = true;
         Serial.println(inputString);
         switch (inputString.charAt(0)) {
+        case 'e':
+            _MSDriverSlave._printDebug = !_MSDriverSlave._printDebug;
+            break;
         case 'r':
             _MSDriverSlave.reg.mode.m0KR = inputString.substring(1).toFloat();
             break;
@@ -87,6 +95,8 @@ void loop()
         case 'd':
             _MSDriverSlave.reg.mode.m0Kd = inputString.substring(1).toFloat();
             break;
+        default:
+            isCommand = false;
         }
 
         inputString = "";
@@ -99,28 +109,16 @@ void loop()
                       _MSDriverSlave.reg.mode.m0Ki,
                       _MSDriverSlave.reg.mode.m0Kd);
 
-        // 先停止电机
-        _MSDriverSlave.motor[0].setMotorPWM(0);
-        delay(2000);
+        if (isCommand) {
+            // 先停止电机
+            _MSDriverSlave.motor[0].setMotorPWM(0);
+            delay(2000);
 
-        // 设置发生变更
-        _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // 正向，PID控制
-        _MSDriverSlave.receivedCmd = true;
+            // 设置发生变更
+            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // 正向，PID控制
+            _MSDriverSlave.receivedCmd = true;
+        }
     }
-}
-
-void initMSDriverSlave()
-{
-    MSDriverReg_MOD_t mode;
-    memset((void *)&mode, 0, sizeof(mode));
-
-    mode.m0Mode = 0b10000000;    // 测速，正向，计数不自动清零，无PID控制
-    mode.m1Mode = 0b10000000;    // 测速，正向，计数不自动清零，无PID控制
-    mode.m2Mode = 0b10000000;    // 测速，正向，计数不自动清零，无PID控制
-    mode.m3Mode = 0b10000000;    // 测速，正向，计数不自动清零，无PID控制
-    mode.smode0123 = 0b11111111; // 舵机模式
-    mode.smode4567 = 0b11111111; // 舵机模式
-    _MSDriverSlave.init(mode);
 }
 
 // 接收串口指令
@@ -169,6 +167,7 @@ void printReadme()
     Serial.println("    同时在串口输出目标值、当前值和控制值，在Arduino "
                    "IDE的\"串口绘图仪\"可观察控制曲线");
     Serial.println("    例：");
+    Serial.println("       e<Enter>     -- 开始/停止打印调试信息");
     Serial.println("       r7<Enter>    -- 设置转速系数");
     Serial.println("       t20<Enter>   -- 设置目标值");
     Serial.println("       p2<Enter>    -- 设置P参数");
@@ -176,3 +175,4 @@ void printReadme()
     Serial.println("       d0.4<Enter>  -- 设置D参数");
     Serial.println("开源地址：https://github.com/LeonO-OChen/MSDriver");
 }
+

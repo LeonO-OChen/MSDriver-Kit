@@ -204,7 +204,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed, int32_t
         // 需要测速 —— AB引脚已通过外部中断自动计数
         if (mode & 0x08) {
             // 需要转换成100ms的计数或PID
-            motor[num].execute(num == 0);
+            motor[num].execute(num == 0 && _printDebug);
             currspeed = motor[num]._count100ms;
         } else {
             // 需要测速 保留总数
@@ -324,17 +324,21 @@ void MSDriverSlave::receiveEvent(int howMany)
 // 主机要求读取寄存器内容
 void MSDriverSlave::requestEvent()
 {
-    // 要求的寄存器地址超出范围
-    if (_MSDriverSlave.regAddr > MSD_REG_ADDR::END) {
-        return;
-    }
+    // // 要求的寄存器地址超出范围
+    // if (_MSDriverSlave.regAddr > MSD_REG_ADDR::END) {
+    //     return;
+    // }
 
-    // 最多一次传送32字节
-    size_t len = MSD_REG_ADDR::END - _MSDriverSlave.regAddr + 1;
-    len = len > 32 ? 32 : len;
+    // // 最多一次传送32字节
+    // size_t len = MSD_REG_ADDR::END - _MSDriverSlave.regAddr + 1;
+    // len = len > 32 ? 32 : len;
 
-    uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
-    Wire.write(&regPtr[_MSDriverSlave.regAddr], len);
+    // uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
+    // Wire.write(&regPtr[_MSDriverSlave.regAddr], len);
+
+    uint32_t d = _MSDriverSlave.regAddr + 1;
+    size_t len = 4;
+    Wire.write((uint8_t *)&d, len);
 }
 
 /*

@@ -31,7 +31,7 @@ void setup()
     pinMode(PIN_LED, OUTPUT);
 
     // 等待其它设备上电完毕
-    delay(500);
+    delay(2000);
 
     initMSDriver2();
 
@@ -56,6 +56,7 @@ void setup()
 void loop()
 {
     static char str[20];
+    static int32_t cnt=0;
     int32_t speed0 = 0;
     int32_t speed1 = 0;
     int32_t speed2 = 0;
@@ -65,10 +66,15 @@ void loop()
         // 每隔200ms切换电机0的速度
         delay(200);
 
-        //_MSDriverMaster.getValueM(0, &speed0);
-        //_MSDriverMaster.getValueM(1, &speed1);
-        //_MSDriverMaster.getValueM(2, &speed2);
-        //_MSDriverMaster.getValueM(3, &speed3);
+        _MSDriverMaster.getValueM(0, &speed0);
+        _MSDriverMaster.getValueM(1, &speed1);
+        _MSDriverMaster.getValueM(2, &speed2);
+        _MSDriverMaster.getValueM(3, &speed3);
+
+        oled.clearDisplay(); // 清屏
+        sprintf(str, "%5d\n", cnt++);
+        oled.setCursor(1, 1);
+        oled.println(str);
 
         sprintf(str, "%7d %7d\n", speed0, speed1);
         oled.setCursor(10, 4);
@@ -86,6 +92,7 @@ void loop()
             _MSDriverMaster.motor(2, 100);
             _MSDriverMaster.motor(3, 100);
             _MSDriverMaster.servo(0, 180);
+
         }
     }
     // 每隔2s切换电机的速度
@@ -115,16 +122,16 @@ void initMSDriver()
 // M0,M2 闭环控制
 void initMSDriver2()
 {
-    uint8_t motorMode0 = 0b10001001; // 测速，正向，PID控制
+    uint8_t motorMode1 = 0b10001001; // 测速，正向，PID控制
     uint8_t motorMode2 = 0b11001001; // 测速，反向，PID控制
     
 
     uint8_t smode = 0b11;            // 舵机模式
     _MSDriverMaster.init(0x32);
-    _MSDriverMaster.setMotorMode(0, motorMode0);            // 设置M0工作模式
-    _MSDriverMaster.setMotorMode(1, motorMode0);            // 设置M1工作模式
+    _MSDriverMaster.setMotorMode(0, motorMode2);            // 设置M0工作模式
+    _MSDriverMaster.setMotorMode(1, motorMode1);            // 设置M1工作模式
     _MSDriverMaster.setMotorMode(2, motorMode2);            // 设置M2工作模式
-    _MSDriverMaster.setMotorMode(3, motorMode2);            // 设置M3工作模式
+    _MSDriverMaster.setMotorMode(3, motorMode1);            // 设置M3工作模式
     _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.8); // 设置所有电机PID参数
     _MSDriverMaster.setServoMode(-1, smode);                // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);
