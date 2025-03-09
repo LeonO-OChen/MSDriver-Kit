@@ -1,4 +1,5 @@
 #include "MSDriverSlave.h"
+#include <stm32f1xx_ll_i2c.h>  
 #include "Wire.h"
 #include "common.h"
 #include "config.h"
@@ -33,9 +34,6 @@ void setup()
     // 使用I2C2 (PB10,PB11引脚)
     Wire.setSCL(I2C2_SCL);
     Wire.setSDA(I2C2_SDA);
-    Wire.onReceive(MSDriverSlave::receiveEvent);
-    Wire.onRequest(MSDriverSlave::requestEvent);
-
     // 打开I2C
     if (digitalRead(PIN_LED)) {
         // 地址跳线断开时
@@ -45,11 +43,8 @@ void setup()
         i2cAddr = I2C_ADD1;
     }
     Wire.begin(i2cAddr);
-
-    // pinMode(I2C2_SCL, OUTPUT_OPEN_DRAIN);
-    // digitalWrite(I2C2_SCL, HIGH); // 释放
-    // pinMode(I2C2_SDA, OUTPUT_OPEN_DRAIN);
-    // digitalWrite(I2C2_SDA, HIGH); // 释放
+    Wire.onReceive(MSDriverSlave::receiveEvent);
+    Wire.onRequest(MSDriverSlave::requestEvent);    // 这行一定要方在Wire.begin()后面
 }
 
 void loop()

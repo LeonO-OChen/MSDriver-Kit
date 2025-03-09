@@ -31,9 +31,7 @@ void setup()
     pinMode(PIN_LED, OUTPUT);
 
     // 等待其它设备上电完毕
-    delay(2000);
-
-    initMSDriver2();
+    delay(1000);
 
     oled.begin(SSD1306_SWITCHCAPVCC, 0x3C);
     oled.clearDisplay(); // 清屏
@@ -42,21 +40,16 @@ void setup()
     oled.setCursor(40, 16);
     oled.println("init...");
     oled.display(); // 显示
-
-    delay(1000);
-    oled.clearDisplay(); // 清屏
-    // oled.setCursor(40, 16);
-    // oled.println("Hello!");
-    oled.display(); // 显示
     oled.setTextSize(1);
-    oled.setCursor(10, 20);
+
+    initMSDriver2();
+    delay(1000);
 }
 
 // 主任务
 void loop()
 {
     static char str[20];
-    static int32_t cnt=0;
     int32_t speed0 = 0;
     int32_t speed1 = 0;
     int32_t speed2 = 0;
@@ -72,10 +65,6 @@ void loop()
         _MSDriverMaster.getValueM(3, &speed3);
 
         oled.clearDisplay(); // 清屏
-        sprintf(str, "%5d\n", cnt++);
-        oled.setCursor(1, 1);
-        oled.println(str);
-
         sprintf(str, "%7d %7d\n", speed0, speed1);
         oled.setCursor(10, 4);
         oled.println(str);
@@ -92,7 +81,6 @@ void loop()
             _MSDriverMaster.motor(2, 100);
             _MSDriverMaster.motor(3, 100);
             _MSDriverMaster.servo(0, 180);
-
         }
     }
     // 每隔2s切换电机的速度
@@ -124,9 +112,8 @@ void initMSDriver2()
 {
     uint8_t motorMode1 = 0b10001001; // 测速，正向，PID控制
     uint8_t motorMode2 = 0b11001001; // 测速，反向，PID控制
-    
 
-    uint8_t smode = 0b11;            // 舵机模式
+    uint8_t smode = 0b11; // 舵机模式
     _MSDriverMaster.init(0x32);
     _MSDriverMaster.setMotorMode(0, motorMode2);            // 设置M0工作模式
     _MSDriverMaster.setMotorMode(1, motorMode1);            // 设置M1工作模式
