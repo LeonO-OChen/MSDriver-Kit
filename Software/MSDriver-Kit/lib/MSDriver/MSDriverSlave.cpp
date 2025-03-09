@@ -297,8 +297,10 @@ void MSDriverSlave::receiveEvent(int howMany)
     uint8_t *regAddrPtr = &_MSDriverSlave.regAddr;
     uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
 
-    // 第一字节为寄存器地址
-    *regAddrPtr = Wire.read();
+    if (Wire.available()) {
+        // 第一字节为寄存器地址
+        *regAddrPtr = Wire.read();
+    }
 
     bool cmdFlg = false;       // 判断是否写过工作模式寄存器
     while (Wire.available()) { // 读取所有接收到的

@@ -43,6 +43,7 @@ bool I2C_Master::ReadDataByte(uint8_t addr, uint8_t reg, uint8_t &val) {
 
     return true;
 }
+
 //读取地址中指定长度的数据（reg：地址  val：数据内容 len：数据长度）
 int I2C_Master::ReadDataArray(uint8_t  addr, uint8_t reg, uint8_t *val,
                            uint8_t  len) {
