@@ -42,9 +42,6 @@ void MSDriverMaster::sendCmd(MSD_CMD cmd)
         0111 xxxx: 相应的B脚作为输出 OUTPUT_OPEN_DRAIN HIGH
 
     1xxx xxxx: 需要测速，AB作为测速中断
-        10xx xxxx: 正向 (因电机安装时方向不同，都顺时针转的话，有的向前，有的向后)
-        11xx xxxx: 反向
-
         1xxx 0xxx: 计数不自动清零
         1xxx 1xxx: 转换成100ms的计数
         1xxx xxx0: 无PID控制

@@ -33,14 +33,12 @@ public:
     unsigned long _sampleTime = 0; // 距离上次采样的微秒数
     int32_t _count = 0;            // 电机的转速计数
 
-    /** 电机是否反向 1：正向 -1：反向**/
-    int8_t _offset = 1;
     uint8_t _pinD1;  // 电机的方向引脚1
     uint8_t _pinD2;  // 电机的方向引脚2
     uint8_t _pinPWM; // 电机的PWM引脚
 
     void enablePID(bool enbable);
-    void setParam(int8_t offset, float kp, float ki, float kd, float kStandradPoint);
+    void setParam(float kp, float ki, float kd, float kStandradPoint);
     void init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2);
     void setMotorTar(int16_t mspeed); // 设置电机目标速度 -- mspeed:速度 -255~255
     void setMotorPWM(int16_t pwm);    // 驱动单个电机 -- pwm:速度 -255~255

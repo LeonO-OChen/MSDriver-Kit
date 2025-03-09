@@ -21,7 +21,7 @@ MSDriverMaster _MSDriverMaster;
 // OLED显示屏
 Adafruit_SSD1306 oled(128, 32, &Wire, -1);
 
-void initMSDriver();
+void initMSDriver1();
 void initMSDriver2();
 
 void setup()
@@ -43,6 +43,7 @@ void setup()
     oled.setTextSize(1);
 
     initMSDriver2();
+
     delay(1000);
 }
 
@@ -55,8 +56,8 @@ void loop()
     int32_t speed2 = 0;
     int32_t speed3 = 0;
     int count = 0;
-    for (int i = 0; i < 20; i++) {
-        // 每隔200ms切换电机0的速度
+    for (int i = 0; i < 50; i++) {
+        // 每隔200ms读取电机的速度
         delay(200);
 
         _MSDriverMaster.getValueM(0, &speed0);
@@ -73,52 +74,44 @@ void loop()
         oled.println(str);
         oled.display(); // 显示
 
-        if (++count == 10) {
-            // 每隔2s切换电机的速度
+        if (++count == 25) {
+            // 每隔5s切换电机的速度
             digitalWrite(PIN_LED, LOW);
-            _MSDriverMaster.motor(0, 100);
+            _MSDriverMaster.motor(0, -100);
             _MSDriverMaster.motor(1, 100);
-            _MSDriverMaster.motor(2, 100);
+            _MSDriverMaster.motor(2, -100);
             _MSDriverMaster.motor(3, 100);
             _MSDriverMaster.servo(0, 180);
         }
     }
-    // 每隔2s切换电机的速度
+    // 每隔5s切换电机的速度
     digitalWrite(PIN_LED, HIGH);
-    _MSDriverMaster.motor(0, -100);
+    _MSDriverMaster.motor(0, 100);
     _MSDriverMaster.motor(1, -100);
-    _MSDriverMaster.motor(2, -100);
+    _MSDriverMaster.motor(2, 100);
     _MSDriverMaster.motor(3, -100);
     _MSDriverMaster.servo(0, 0);
 }
 
 // 4电机开环控制，舵机全开
-void initMSDriver()
+void initMSDriver1()
 {
-    uint8_t motorMode01 = 0b10000000; // 测速，正向，计数不自动清零，无PID控制
-    uint8_t motorMode23 = 0b10010000; // 测速，反向，计数不自动清零，无PID控制
-    uint8_t smode = 0b11;             // 舵机模式
+    uint8_t motorMode = 0b10001000; // 测速，计数自动清零，无PID控制
+    uint8_t smode = 0b11;           // 舵机模式
     _MSDriverMaster.init(0x32);
-    _MSDriverMaster.setMotorMode(0, motorMode01); // 设置M0工作模式
-    _MSDriverMaster.setMotorMode(1, motorMode01); // 设置M1工作模式
-    _MSDriverMaster.setMotorMode(2, motorMode23); // 设置M2工作模式
-    _MSDriverMaster.setMotorMode(3, motorMode23); // 设置M3工作模式
-    _MSDriverMaster.setServoMode(-1, smode);      // 设置所有舵机工作模式
+    _MSDriverMaster.setMotorMode(-1, motorMode); // 设置所有电机M0工作模式
+    _MSDriverMaster.setServoMode(-1, smode);     // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);
 }
 
-// M0,M2 闭环控制
+// 闭环控制
 void initMSDriver2()
 {
-    uint8_t motorMode1 = 0b10001001; // 测速，正向，PID控制
-    uint8_t motorMode2 = 0b11001001; // 测速，反向，PID控制
+    uint8_t motorMode = 0b10001001; // 测速，计数自动清零，PID控制
 
     uint8_t smode = 0b11; // 舵机模式
     _MSDriverMaster.init(0x32);
-    _MSDriverMaster.setMotorMode(0, motorMode2);            // 设置M0工作模式
-    _MSDriverMaster.setMotorMode(1, motorMode1);            // 设置M1工作模式
-    _MSDriverMaster.setMotorMode(2, motorMode2);            // 设置M2工作模式
-    _MSDriverMaster.setMotorMode(3, motorMode1);            // 设置M3工作模式
+    _MSDriverMaster.setMotorMode(-1, motorMode);            // 设置所有电机M0工作模式
     _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.8); // 设置所有电机PID参数
     _MSDriverMaster.setServoMode(-1, smode);                // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);

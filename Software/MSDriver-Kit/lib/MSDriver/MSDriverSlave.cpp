@@ -123,10 +123,10 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki, float 
 
         if (mode & 0b01000000) {
             // 反向
-            motor[num].setParam(-1, kp, ki, kd, kR);
+            motor[num].setParam(kp, ki, kd, kR);
         } else {
             // 正向
-            motor[num].setParam(1, kp, ki, kd, kR);
+            motor[num].setParam(kp, ki, kd, kR);
         }
 
         if (mode & 0b01001 == 0b01001) {

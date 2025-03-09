@@ -1,10 +1,7 @@
 #include "PIDMotor.h"
 
-void PIDMotor::setParam(int8_t offset, float kp, float ki, float kd, float kStandradPoint)
+void PIDMotor::setParam(float kp, float ki, float kd, float kStandradPoint)
 {
-    // 轮子方向
-    _offset = offset;
-
     // PID参数
     _pidCtrl.kp = kp;
     _pidCtrl.ki = _pidCtrl.ki * _pidCtrl.T;
@@ -33,13 +30,13 @@ void PIDMotor::init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2)
     _pidCtrl.min = -255;
 
     // 默认PID
-    setParam(1, 0.6, 0.000001, 0, 7.02);
+    setParam(0.6, 0.000001, 0, 7.02);
 }
 
 // 驱动电机 --mspeed:速度 -255~255
-void PIDMotor::setMotorTar(int16_t mspeed)
+void PIDMotor::setMotorTar(int16_t speed)
 {
-    bBreak = (mspeed == 0x0E0E); // 是否刹车
+    bBreak = (speed == 0x0E0E); // 是否刹车
 
     if (bBreak) {
         // 刹车
@@ -47,10 +44,9 @@ void PIDMotor::setMotorTar(int16_t mspeed)
         digitalWrite(_pinD2, HIGH);
         analogWrite(_pinPWM, 255);
     } else {
-        mspeed = mspeed > 255 ? 255 : mspeed;
-        mspeed = mspeed < -255 ? -255 : mspeed;
+        speed = speed > 255 ? 255 : speed;
+        speed = speed < -255 ? -255 : speed;
 
-        int speed = mspeed * _offset;
         if (bEnabledPID) {
             _count100msTar = _kStandradPoint * speed;
         } else {
