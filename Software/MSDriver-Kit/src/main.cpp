@@ -1,5 +1,4 @@
 #include "MSDriverSlave.h"
-#include <stm32f1xx_ll_i2c.h>  
 #include "Wire.h"
 #include "common.h"
 #include "config.h"
@@ -44,7 +43,7 @@ void setup()
     }
     Wire.begin(i2cAddr);
     Wire.onReceive(MSDriverSlave::receiveEvent);
-    Wire.onRequest(MSDriverSlave::requestEvent);    // 这行一定要方在Wire.begin()后面
+    Wire.onRequest(MSDriverSlave::requestEvent); // 这行一定要方在Wire.begin()后面
 }
 
 void loop()
@@ -71,8 +70,14 @@ void loop()
         bool isCommand = true;
         Serial.println(inputString);
         switch (inputString.charAt(0)) {
+        case '?':
+            printReadme();
+            Serial.println();
+            isCommand = false;
+            break;
         case 'e':
             _MSDriverSlave._printDebug = !_MSDriverSlave._printDebug;
+            isCommand = false;
             break;
         case 'r':
             _MSDriverSlave.reg.mode.m0KR = inputString.substring(1).toFloat();
@@ -110,7 +115,8 @@ void loop()
             delay(2000);
 
             // 设置发生变更
-            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // 正向，PID控制
+            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
+            _MSDriverSlave.reg.cmd = APPLY;
             _MSDriverSlave.receivedCmd = true;
         }
     }
@@ -162,6 +168,7 @@ void printReadme()
     Serial.println("    同时在串口输出目标值、当前值和控制值，在Arduino "
                    "IDE的\"串口绘图仪\"可观察控制曲线");
     Serial.println("    例：");
+    Serial.println("       ?<Enter>     -- 帮助");
     Serial.println("       e<Enter>     -- 开始/停止打印调试信息");
     Serial.println("       r7<Enter>    -- 设置转速系数");
     Serial.println("       t20<Enter>   -- 设置目标值");
@@ -170,4 +177,3 @@ void printReadme()
     Serial.println("       d0.4<Enter>  -- 设置D参数");
     Serial.println("开源地址：https://github.com/LeonO-OChen/MSDriver");
 }
-
