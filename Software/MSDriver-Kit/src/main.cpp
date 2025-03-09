@@ -11,8 +11,7 @@ bool stringComplete = false; // 判断有没有接收完毕
 
 void printReadme();
 
-void setup()
-{
+void setup() {
     Serial.begin(115200); // 初始化串口通信
 
     // ===========================================
@@ -43,11 +42,11 @@ void setup()
     }
     Wire.begin(i2cAddr);
     Wire.onReceive(MSDriverSlave::receiveEvent);
-    Wire.onRequest(MSDriverSlave::requestEvent); // 这行一定要方在Wire.begin()后面
+    Wire.onRequest(
+        MSDriverSlave::requestEvent); // 这行一定要方在Wire.begin()后面
 }
 
-void loop()
-{
+void loop() {
     static unsigned long t0 = micros();
     static unsigned long t2 = micros();
     static bool blink = false;
@@ -67,24 +66,24 @@ void loop()
 
     // 判断是否收到PID调参指令 ==> 对M0进行PID调参
     if (stringComplete) {
-        bool isCommand = true;
+        // 是否改变了参数
+        bool isChanged = true;
         Serial.println(inputString);
         switch (inputString.charAt(0)) {
         case '?':
             printReadme();
             Serial.println();
-            isCommand = false;
+            isChanged = false;
             break;
         case 'e':
-            _MSDriverSlave._printDebug = !_MSDriverSlave._printDebug;
-            isCommand = false;
+            _MSDriverSlave._tunePID = !_MSDriverSlave._tunePID;
             break;
         case 'r':
             _MSDriverSlave.reg.mode.m0KR = inputString.substring(1).toFloat();
             break;
         case 't':
             _MSDriverSlave.reg.ctrl.speedM[0] =
-                inputString.substring(1).toFloat();
+                inputString.substring(1).toInt();
             break;
         case 'p':
             _MSDriverSlave.reg.mode.m0Kp = inputString.substring(1).toFloat();
@@ -96,11 +95,17 @@ void loop()
             _MSDriverSlave.reg.mode.m0Kd = inputString.substring(1).toFloat();
             break;
         default:
-            isCommand = false;
+            isChanged = false;
         }
 
         inputString = "";
         stringComplete = false;
+
+        if (_MSDriverSlave._tunePID) {
+            Serial.println("PID调参：ON");
+        } else {
+            Serial.println("PID调参：OFF");
+        }
 
         Serial.printf("转速系数(r): %f 目标速度(t): %d \n",
                       _MSDriverSlave.reg.mode.m0KR,
@@ -109,7 +114,7 @@ void loop()
                       _MSDriverSlave.reg.mode.m0Ki,
                       _MSDriverSlave.reg.mode.m0Kd);
 
-        if (isCommand) {
+        if (isChanged) {
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
             delay(2000);
@@ -117,14 +122,12 @@ void loop()
             // 设置发生变更
             _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
             _MSDriverSlave.reg.cmd = APPLY;
-            _MSDriverSlave.receivedCmd = true;
         }
     }
 }
 
 // 接收串口指令
-void serialEvent()
-{
+void serialEvent() {
     while (Serial.available()) {
         char inChar = (char)Serial.read();
         inputString += inChar;
@@ -135,8 +138,7 @@ void serialEvent()
     }
 }
 
-void printReadme()
-{
+void printReadme() {
     Serial.println("4路电机8路舵机控制模块 MSDriver (ver:2.1)");
     Serial.printf("I2C address: 0x%02X\n", i2cAddr);
     Serial.println("指令格式：REG地址，数据1，数据2，……");
@@ -169,7 +171,7 @@ void printReadme()
                    "IDE的\"串口绘图仪\"可观察控制曲线");
     Serial.println("    例：");
     Serial.println("       ?<Enter>     -- 帮助");
-    Serial.println("       e<Enter>     -- 开始/停止打印调试信息");
+    Serial.println("       e<Enter>     -- 开始/停止调参");
     Serial.println("       r7<Enter>    -- 设置转速系数");
     Serial.println("       t20<Enter>   -- 设置目标值");
     Serial.println("       p2<Enter>    -- 设置P参数");

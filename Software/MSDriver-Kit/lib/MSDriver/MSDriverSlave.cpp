@@ -3,8 +3,7 @@
 #include "common.h"
 #include "config.h"
 
-void MSDriverSlave::init()
-{
+void MSDriverSlave::init() {
     // 编码电机0
     pinMode(PIN_M0_PWM, OUTPUT);
     pinMode(PIN_M0_F1, OUTPUT);
@@ -46,12 +45,9 @@ void MSDriverSlave::init()
     motor[1].init(PIN_M1_PWM, PIN_M1_F1, PIN_M1_F2);
     motor[2].init(PIN_M2_PWM, PIN_M2_F1, PIN_M2_F2);
     motor[3].init(PIN_M3_PWM, PIN_M3_F1, PIN_M3_F2);
-
-    receivedCmd = false;
 }
 
-void MSDriverSlave::init(const MSDriverReg_MOD_t &mod)
-{
+void MSDriverSlave::init(const MSDriverReg_MOD_t &mod) {
     init();
 
     memcpy(&reg.mode, &(mod), sizeof(MSDriverReg_MOD_t));
@@ -61,14 +57,12 @@ void MSDriverSlave::init(const MSDriverReg_MOD_t &mod)
     setModeByReg();
 }
 
-void MSDriverSlave::execute()
-{
+void MSDriverSlave::execute() {
     static unsigned long t0 = micros();
-    if (receivedCmd) {
+    if (reg.cmd) {
         // 收到变更工作模式的指令
         // 把寄存器信息复制到影子寄存器——防止被随时覆盖后影响正在进行的操作
         memcpy(&shadowRegMod, &(reg.mode), sizeof(MSDriverReg_MOD_t));
-        receivedCmd = false;
 
         if (reg.cmd == APPLY) {
             // 根据寄存器配置工作模式
@@ -76,32 +70,53 @@ void MSDriverSlave::execute()
         } else if (reg.cmd == INIT) {
             init();
         }
+
+        reg.cmd = 0;
     }
 
     // M0 ~ M3
-    motorAction(0, shadowRegMod.m0Mode, reg.ctrl.speedM[0], reg.feedback.currspeedM[0], PIN_M0_A, PIN_M0_B);
-    motorAction(1, shadowRegMod.m1Mode, reg.ctrl.speedM[1], reg.feedback.currspeedM[1], PIN_M1_A, PIN_M1_B);
-    motorAction(2, shadowRegMod.m2Mode, reg.ctrl.speedM[2], reg.feedback.currspeedM[2], PIN_M2_A, PIN_M2_B);
-    motorAction(3, shadowRegMod.m3Mode, reg.ctrl.speedM[3], reg.feedback.currspeedM[3], PIN_M3_A, PIN_M3_B);
+    motorAction(0, shadowRegMod.m0Mode, reg.ctrl.speedM[0],
+                reg.feedback.currspeedM[0], PIN_M0_A, PIN_M0_B);
+    motorAction(1, shadowRegMod.m1Mode, reg.ctrl.speedM[1],
+                reg.feedback.currspeedM[1], PIN_M1_A, PIN_M1_B);
+    motorAction(2, shadowRegMod.m2Mode, reg.ctrl.speedM[2],
+                reg.feedback.currspeedM[2], PIN_M2_A, PIN_M2_B);
+    motorAction(3, shadowRegMod.m3Mode, reg.ctrl.speedM[3],
+                reg.feedback.currspeedM[3], PIN_M3_A, PIN_M3_B);
 
     // S0 ~ S7
-    servoAction(0, PIN_S0, shadowRegMod.smode0123, reg.ctrl.angleS[0], reg.feedback.currValueS[0]);
-    servoAction(1, PIN_S1, shadowRegMod.smode0123 >> 2, reg.ctrl.angleS[1], reg.feedback.currValueS[1]);
-    servoAction(2, PIN_S2, shadowRegMod.smode0123 >> 4, reg.ctrl.angleS[2], reg.feedback.currValueS[2]);
-    servoAction(3, PIN_S3, shadowRegMod.smode0123 >> 6, reg.ctrl.angleS[3], reg.feedback.currValueS[3]);
-    servoAction(4, PIN_S4, shadowRegMod.smode4567, reg.ctrl.angleS[4], reg.feedback.currValueS[4]);
-    servoAction(5, PIN_S5, shadowRegMod.smode4567 >> 2, reg.ctrl.angleS[5], reg.feedback.currValueS[5]);
-    servoAction(6, PIN_S6, shadowRegMod.smode4567 >> 4, reg.ctrl.angleS[6], reg.feedback.currValueS[6]);
-    servoAction(7, PIN_S7, shadowRegMod.smode4567 >> 6, reg.ctrl.angleS[7], reg.feedback.currValueS[7]);
+    servoAction(0, PIN_S0, shadowRegMod.smode0123, reg.ctrl.angleS[0],
+                reg.feedback.currValueS[0]);
+    servoAction(1, PIN_S1, shadowRegMod.smode0123 >> 2, reg.ctrl.angleS[1],
+                reg.feedback.currValueS[1]);
+    servoAction(2, PIN_S2, shadowRegMod.smode0123 >> 4, reg.ctrl.angleS[2],
+                reg.feedback.currValueS[2]);
+    servoAction(3, PIN_S3, shadowRegMod.smode0123 >> 6, reg.ctrl.angleS[3],
+                reg.feedback.currValueS[3]);
+    servoAction(4, PIN_S4, shadowRegMod.smode4567, reg.ctrl.angleS[4],
+                reg.feedback.currValueS[4]);
+    servoAction(5, PIN_S5, shadowRegMod.smode4567 >> 2, reg.ctrl.angleS[5],
+                reg.feedback.currValueS[5]);
+    servoAction(6, PIN_S6, shadowRegMod.smode4567 >> 4, reg.ctrl.angleS[6],
+                reg.feedback.currValueS[6]);
+    servoAction(7, PIN_S7, shadowRegMod.smode4567 >> 6, reg.ctrl.angleS[7],
+                reg.feedback.currValueS[7]);
 }
 
-void MSDriverSlave::setModeByReg()
-{
+void MSDriverSlave::setModeByReg() {
     // M0 ~ M3
-    motorSetup(0, shadowRegMod.m0Mode, shadowRegMod.m0Kp, shadowRegMod.m0Ki, shadowRegMod.m0Kd, shadowRegMod.m0KR, PIN_M0_A, PIN_M0_B, ReadM0ASpeed, ReadM0BSpeed);
-    motorSetup(1, shadowRegMod.m1Mode, shadowRegMod.m1Kp, shadowRegMod.m1Ki, shadowRegMod.m1Kd, shadowRegMod.m1KR, PIN_M1_A, PIN_M1_B, ReadM1ASpeed, ReadM1BSpeed);
-    motorSetup(2, shadowRegMod.m2Mode, shadowRegMod.m2Kp, shadowRegMod.m2Ki, shadowRegMod.m2Kd, shadowRegMod.m2KR, PIN_M2_A, PIN_M2_B, ReadM2ASpeed, ReadM2BSpeed);
-    motorSetup(3, shadowRegMod.m3Mode, shadowRegMod.m3Kp, shadowRegMod.m3Ki, shadowRegMod.m3Kd, shadowRegMod.m3KR, PIN_M3_A, PIN_M3_B, ReadM3ASpeed, ReadM3BSpeed);
+    motorSetup(0, shadowRegMod.m0Mode, shadowRegMod.m0Kp, shadowRegMod.m0Ki,
+               shadowRegMod.m0Kd, shadowRegMod.m0KR, PIN_M0_A, PIN_M0_B,
+               ReadM0ASpeed, ReadM0BSpeed);
+    motorSetup(1, shadowRegMod.m1Mode, shadowRegMod.m1Kp, shadowRegMod.m1Ki,
+               shadowRegMod.m1Kd, shadowRegMod.m1KR, PIN_M1_A, PIN_M1_B,
+               ReadM1ASpeed, ReadM1BSpeed);
+    motorSetup(2, shadowRegMod.m2Mode, shadowRegMod.m2Kp, shadowRegMod.m2Ki,
+               shadowRegMod.m2Kd, shadowRegMod.m2KR, PIN_M2_A, PIN_M2_B,
+               ReadM2ASpeed, ReadM2BSpeed);
+    motorSetup(3, shadowRegMod.m3Mode, shadowRegMod.m3Kp, shadowRegMod.m3Ki,
+               shadowRegMod.m3Kd, shadowRegMod.m3KR, PIN_M3_A, PIN_M3_B,
+               ReadM3ASpeed, ReadM3BSpeed);
 
     // S0 ~ S7
     servoSetup(0, PIN_S0, shadowRegMod.smode0123);
@@ -114,8 +129,10 @@ void MSDriverSlave::setModeByReg()
     servoSetup(7, PIN_S7, shadowRegMod.smode4567 >> 6);
 }
 
-void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki, float kd, float kR, uint8_t pinA, uint8_t pinB, void (*interruptFunA)(void), void (*interruptFunB)(void))
-{
+void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
+                               float kd, float kR, uint8_t pinA, uint8_t pinB,
+                               void (*interruptFunA)(void),
+                               void (*interruptFunB)(void)) {
     if (mode & 0x80) {
         // 需要测速
         pinMode(pinA, INPUT);
@@ -192,8 +209,9 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki, float 
     }
 }
 
-void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed, int32_t &currspeed, uint8_t pinA, uint8_t pinB)
-{
+void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
+                                int32_t &currspeed, uint8_t pinA,
+                                uint8_t pinB) {
     // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
     if (shadowRegCtrl.speedM[num] == inSpeed) {
         motor[num].setMotorTar(inSpeed);
@@ -204,7 +222,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed, int32_t
         // 需要测速 —— AB引脚已通过外部中断自动计数
         if (mode & 0x08) {
             // 需要转换成100ms的计数或PID
-            motor[num].execute(num == 0 && _printDebug);
+            motor[num].execute(num == 0 && _tunePID);
             currspeed = motor[num]._count100ms;
         } else {
             // 需要测速 保留总数
@@ -258,8 +276,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed, int32_t
     }
 }
 
-void MSDriverSlave::servoSetup(int num, uint8_t pin, uint8_t mode)
-{
+void MSDriverSlave::servoSetup(int num, uint8_t pin, uint8_t mode) {
     if (mode & 0b0011) {
         pinMode(pin, OUTPUT);
         servo[num].attach(pin);
@@ -270,8 +287,8 @@ void MSDriverSlave::servoSetup(int num, uint8_t pin, uint8_t mode)
     }
 }
 
-void MSDriverSlave::servoAction(int num, uint8_t pin, uint8_t mode, uint8_t angle, uint16_t &currValue)
-{
+void MSDriverSlave::servoAction(int num, uint8_t pin, uint8_t mode,
+                                uint8_t angle, uint16_t &currValue) {
     switch (mode & 0b0011) {
     case 0b001:
         // OUTPUT 高低电平
@@ -292,8 +309,7 @@ void MSDriverSlave::servoAction(int num, uint8_t pin, uint8_t mode, uint8_t angl
     }
 }
 
-void MSDriverSlave::receiveEvent(int howMany)
-{
+void MSDriverSlave::receiveEvent(int howMany) {
     uint8_t *regAddrPtr = &_MSDriverSlave.regAddr;
     uint8_t *regPtr = (uint8_t *)&_MSDriverSlave.reg;
 
@@ -302,30 +318,20 @@ void MSDriverSlave::receiveEvent(int howMany)
         *regAddrPtr = Wire.read();
     }
 
-    bool cmdFlg = false;       // 判断是否写过工作模式寄存器
     while (Wire.available()) { // 读取所有接收到的
         uint8_t c = Wire.read();
         // 如果是可写寄存器
-        if (*regAddrPtr >= MSD_REG_ADDR::CMD && *regAddrPtr < MSD_REG_ADDR::S0_ANGLE_R) {
+        if (*regAddrPtr >= MSD_REG_ADDR::CMD &&
+            *regAddrPtr < MSD_REG_ADDR::S0_ANGLE_R) {
             // 写入寄存器
             regPtr[*regAddrPtr] = c;
-
-            if (*regAddrPtr == MSD_REG_ADDR::CMD) {
-                cmdFlg = true;
-            }
         }
         (*regAddrPtr)++;
-    }
-
-    // 收到改变模式指令
-    if (cmdFlg) {
-        _MSDriverSlave.receivedCmd = true;
     }
 }
 
 // 主机要求读取寄存器内容
-void MSDriverSlave::requestEvent()
-{
+void MSDriverSlave::requestEvent() {
     // 要求的寄存器地址超出范围
     if (_MSDriverSlave.regAddr > MSD_REG_ADDR::END) {
         return;
@@ -342,8 +348,7 @@ void MSDriverSlave::requestEvent()
 /*
     对M0 进行转速计数
 */
-void MSDriverSlave::ReadM0ASpeed()
-{
+void MSDriverSlave::ReadM0ASpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[0]._count;
     if (digitalRead(PIN_M0_A) == HIGH) {
         if (digitalRead(PIN_M0_B) == LOW) {
@@ -370,8 +375,7 @@ void MSDriverSlave::ReadM0ASpeed()
 /*
     对M0 进行转速计数
 */
-void MSDriverSlave::ReadM0BSpeed()
-{
+void MSDriverSlave::ReadM0BSpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[0]._count;
     if (digitalRead(PIN_M0_B) == HIGH) {
         if (digitalRead(PIN_M0_A) == LOW) {
@@ -398,8 +402,7 @@ void MSDriverSlave::ReadM0BSpeed()
 /*
     对M1 进行转速计数
 */
-void MSDriverSlave::ReadM1ASpeed()
-{
+void MSDriverSlave::ReadM1ASpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[1]._count;
 
     if (digitalRead(PIN_M1_A) == HIGH) {
@@ -427,8 +430,7 @@ void MSDriverSlave::ReadM1ASpeed()
 /*
     对M1 进行转速计数
 */
-void MSDriverSlave::ReadM1BSpeed()
-{
+void MSDriverSlave::ReadM1BSpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[1]._count;
     if (digitalRead(PIN_M1_B) == HIGH) {
         if (digitalRead(PIN_M1_A) == LOW) {
@@ -456,8 +458,7 @@ void MSDriverSlave::ReadM1BSpeed()
     对M2 进行转速计数
     使用中断引脚PB4
 */
-void MSDriverSlave::ReadM2ASpeed()
-{
+void MSDriverSlave::ReadM2ASpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[2]._count;
     if (digitalRead(PIN_M2_A) == HIGH) {
         if (digitalRead(PIN_M2_B) == LOW) {
@@ -485,8 +486,7 @@ void MSDriverSlave::ReadM2ASpeed()
     对M2 进行转速计数
     使用中断引脚PB3
 */
-void MSDriverSlave::ReadM2BSpeed()
-{
+void MSDriverSlave::ReadM2BSpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[2]._count;
     if (digitalRead(PIN_M2_B) == HIGH) {
         if (digitalRead(PIN_M2_A) == LOW) {
@@ -513,8 +513,7 @@ void MSDriverSlave::ReadM2BSpeed()
 /*
     对M3 进行转速计数
 */
-void MSDriverSlave::ReadM3ASpeed()
-{
+void MSDriverSlave::ReadM3ASpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[3]._count;
     if (digitalRead(PIN_M3_A) == HIGH) {
         if (digitalRead(PIN_M3_B) == LOW) {
@@ -541,8 +540,7 @@ void MSDriverSlave::ReadM3ASpeed()
 /*
     对M3 进行转速计数
 */
-void MSDriverSlave::ReadM3BSpeed()
-{
+void MSDriverSlave::ReadM3BSpeed() {
     int32_t *ptr = &_MSDriverSlave.motor[3]._count;
     if (digitalRead(PIN_M3_B) == HIGH) {
         if (digitalRead(PIN_M3_A) == LOW) {
@@ -566,7 +564,6 @@ void MSDriverSlave::ReadM3BSpeed()
     }
 }
 
-void MSDriverSlave::getfeedBack(MSDriverReg_FB_t *buf)
-{
+void MSDriverSlave::getfeedBack(MSDriverReg_FB_t *buf) {
     memcpy(buf, &(reg.feedback), sizeof(MSDriverReg_FB_t));
 }
