@@ -137,15 +137,8 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
         // 需要测速
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
-
-        if (mode & 0b01000000) {
-            // 反向
-            motor[num].setParam(kp, ki, kd, kR);
-        } else {
-            // 正向
-            motor[num].setParam(kp, ki, kd, kR);
-        }
-
+        
+        motor[num].setParam(kp, ki, kd, kR);
         if (mode & 0b01001 == 0b01001) {
             // PID控制
             motor[num].enablePID(true);

@@ -42,13 +42,12 @@ void setup() {
     }
     Wire.begin(i2cAddr);
     Wire.onReceive(MSDriverSlave::receiveEvent);
-    Wire.onRequest(
-        MSDriverSlave::requestEvent); // 这行一定要方在Wire.begin()后面
+    // 这行一定要方在Wire.begin()后面
+    Wire.onRequest(MSDriverSlave::requestEvent);
 }
 
 void loop() {
     static unsigned long t0 = micros();
-    static unsigned long t2 = micros();
     static bool blink = false;
     if (timePassed(t0, 200)) {
         // 每隔200ms闪灯
@@ -103,8 +102,14 @@ void loop() {
 
         if (_MSDriverSlave._tunePID) {
             Serial.println("PID调参：ON");
+            // 设置发生变更
+            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
+            _MSDriverSlave.reg.cmd = APPLY;
         } else {
             Serial.println("PID调参：OFF");
+            // 设置发生变更
+            _MSDriverSlave.reg.mode.m0Mode = 0b10001000; // 无PID控制
+            _MSDriverSlave.reg.cmd = APPLY;
         }
 
         Serial.printf("转速系数(r): %f 目标速度(t): %d \n",
@@ -118,10 +123,6 @@ void loop() {
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
             delay(2000);
-
-            // 设置发生变更
-            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
-            _MSDriverSlave.reg.cmd = APPLY;
         }
     }
 }
