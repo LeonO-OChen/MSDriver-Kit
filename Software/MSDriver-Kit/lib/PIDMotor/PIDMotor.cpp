@@ -30,7 +30,7 @@ void PIDMotor::init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2)
     _pidCtrl.min = -255;
 
     // 默认PID
-    setParam(0.6, 0.000001, 0, 7.02);
+    setParam(0.6, 0.000001, 0, 2);
 }
 
 // 驱动电机 --mspeed:速度 -255~255

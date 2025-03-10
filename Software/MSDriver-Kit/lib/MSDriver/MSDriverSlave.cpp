@@ -38,13 +38,14 @@ void MSDriverSlave::init() {
     memset((void *)&shadowRegMod, 0, sizeof(shadowRegMod));
     memset((void *)&shadowRegCtrl, 0, sizeof(shadowRegCtrl));
     reg.id = 0x11; // 可以任意修改
-    setModeByReg();
 
     // 电机引脚
     motor[0].init(PIN_M0_PWM, PIN_M0_F1, PIN_M0_F2);
     motor[1].init(PIN_M1_PWM, PIN_M1_F1, PIN_M1_F2);
     motor[2].init(PIN_M2_PWM, PIN_M2_F1, PIN_M2_F2);
     motor[3].init(PIN_M3_PWM, PIN_M3_F1, PIN_M3_F2);
+
+    setModeByReg();
 }
 
 void MSDriverSlave::init(const MSDriverReg_MOD_t &mod) {
@@ -63,6 +64,7 @@ void MSDriverSlave::execute() {
         // 收到变更工作模式的指令
         // 把寄存器信息复制到影子寄存器——防止被随时覆盖后影响正在进行的操作
         memcpy(&shadowRegMod, &(reg.mode), sizeof(MSDriverReg_MOD_t));
+
 
         if (reg.cmd == APPLY) {
             // 根据寄存器配置工作模式
@@ -104,6 +106,7 @@ void MSDriverSlave::execute() {
 }
 
 void MSDriverSlave::setModeByReg() {
+
     // M0 ~ M3
     motorSetup(0, shadowRegMod.m0Mode, shadowRegMod.m0Kp, shadowRegMod.m0Ki,
                shadowRegMod.m0Kd, shadowRegMod.m0KR, PIN_M0_A, PIN_M0_B,
@@ -137,7 +140,7 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
         // 需要测速
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
-        
+
         motor[num].setParam(kp, ki, kd, kR);
         if (mode & 0b01001 == 0b01001) {
             // PID控制
@@ -205,6 +208,7 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
 void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
                                 int32_t &currspeed, uint8_t pinA,
                                 uint8_t pinB) {
+
     // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
     if (shadowRegCtrl.speedM[num] == inSpeed) {
         motor[num].setMotorTar(inSpeed);

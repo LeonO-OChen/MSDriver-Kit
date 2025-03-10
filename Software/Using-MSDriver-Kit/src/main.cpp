@@ -42,7 +42,7 @@ void setup()
     oled.display(); // 显示
     oled.setTextSize(1);
 
-    initMSDriver2();
+    initMSDriver1();
 
     delay(1000);
 }

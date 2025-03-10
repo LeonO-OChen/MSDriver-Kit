@@ -100,18 +100,6 @@ void loop() {
         inputString = "";
         stringComplete = false;
 
-        if (_MSDriverSlave._tunePID) {
-            Serial.println("PID调参：ON");
-            // 设置发生变更
-            _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
-            _MSDriverSlave.reg.cmd = APPLY;
-        } else {
-            Serial.println("PID调参：OFF");
-            // 设置发生变更
-            _MSDriverSlave.reg.mode.m0Mode = 0b10001000; // 无PID控制
-            _MSDriverSlave.reg.cmd = APPLY;
-        }
-
         Serial.printf("转速系数(r): %f 目标速度(t): %d \n",
                       _MSDriverSlave.reg.mode.m0KR,
                       _MSDriverSlave.reg.ctrl.speedM[0]);
@@ -120,9 +108,25 @@ void loop() {
                       _MSDriverSlave.reg.mode.m0Kd);
 
         if (isChanged) {
+            if (_MSDriverSlave._tunePID) {
+                Serial.println("PID调参：ON");
+            } else {
+                Serial.println("PID调参：OFF");
+            }
+            
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
             delay(2000);
+
+            if (_MSDriverSlave._tunePID) {
+                // 设置发生变更
+                _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
+                _MSDriverSlave.reg.cmd = APPLY;
+            } else {
+                // 设置发生变更
+                _MSDriverSlave.reg.mode.m0Mode = 0b10001000; // 无PID控制
+                _MSDriverSlave.reg.cmd = APPLY;
+            }
         }
     }
 }
