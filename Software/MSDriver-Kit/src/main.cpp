@@ -113,18 +113,18 @@ void loop() {
             } else {
                 Serial.println("PID调参：OFF");
             }
-            
+
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
             delay(2000);
 
             if (_MSDriverSlave._tunePID) {
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b10001001; // PID控制
+                _MSDriverSlave.reg.mode.m0Mode = 0b10011001; // PID控制(电机使能)
                 _MSDriverSlave.reg.cmd = APPLY;
             } else {
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b10001000; // 无PID控制
+                _MSDriverSlave.reg.mode.m0Mode = 0b10010001; // PID控制(电机禁用)
                 _MSDriverSlave.reg.cmd = APPLY;
             }
         }

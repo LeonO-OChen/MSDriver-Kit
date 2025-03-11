@@ -22,6 +22,8 @@ void MSDriverMaster::sendCmd(MSD_CMD cmd)
 设置指定电机的工作模式，num=-1时，设置所有电机
 
  电机工作模式
+    s7:测速使能位
+    s3:电机使能位
     0xxx xxxx: 默认 无需测速，相应的AB引脚作为IO口
         0xxx x000: 相应的A脚作为数字输入 INPUT
         0xxx x001: 相应的A脚作为模拟输入 INPUT
@@ -42,10 +44,10 @@ void MSDriverMaster::sendCmd(MSD_CMD cmd)
         0111 xxxx: 相应的B脚作为输出 OUTPUT_OPEN_DRAIN HIGH
 
     1xxx xxxx: 需要测速，AB作为测速中断
-        1xxx 0xxx: 计数不自动清零
-        1xxx 1xxx: 转换成100ms的计数
+        1xx0 xxxx: 计数不自动清零
+        1xx1 xxxx: 转换成100ms的计数
         1xxx xxx0: 无PID控制
-        1xxx 1xx1: 需PID控制
+        1xx1 xxx1: 需PID控制
 */
 void MSDriverMaster::setMotorMode(int num, uint8_t &mode)
 {
@@ -257,6 +259,13 @@ void MSDriverMaster::motorBreak(int8_t num)
 {
     uint8_t reg = M0_SPEED + (num << 1);
     uint16_t data = 0x0E0E;
+    writeReg(reg, (uint8_t *)&data, 2);
+}
+
+void MSDriverMaster::motorRelease(int8_t num)
+{
+    uint8_t reg = M0_SPEED + (num << 1);
+    uint16_t data = 0x0E00;
     writeReg(reg, (uint8_t *)&data, 2);
 }
 

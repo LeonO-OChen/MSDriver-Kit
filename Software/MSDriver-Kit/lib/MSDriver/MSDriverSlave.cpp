@@ -64,8 +64,6 @@ void MSDriverSlave::execute() {
         // 收到变更工作模式的指令
         // 把寄存器信息复制到影子寄存器——防止被随时覆盖后影响正在进行的操作
         memcpy(&shadowRegMod, &(reg.mode), sizeof(MSDriverReg_MOD_t));
-
-
         if (reg.cmd == APPLY) {
             // 根据寄存器配置工作模式
             setModeByReg();
@@ -136,13 +134,19 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
                                float kd, float kR, uint8_t pinA, uint8_t pinB,
                                void (*interruptFunA)(void),
                                void (*interruptFunB)(void)) {
+
+    if (mode & 0x08 == 0){
+        // 电机无效
+        motor[num].setMotorTar(0x0E00);
+    }
+
     if (mode & 0x80) {
         // 需要测速
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
 
         motor[num].setParam(kp, ki, kd, kR);
-        if (mode & 0b01001 == 0b01001) {
+        if (mode & 0b010001 == 0b010001) {
             // PID控制
             motor[num].enablePID(true);
         } else {
@@ -211,13 +215,16 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
 
     // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
     if (shadowRegCtrl.speedM[num] == inSpeed) {
-        motor[num].setMotorTar(inSpeed);
+        if (mode & 0x08){
+            // 电机有效时设置目标速度
+            motor[num].setMotorTar(inSpeed);
+        }
     }
     shadowRegCtrl.speedM[num] = inSpeed;
 
     if (mode & 0x80) {
         // 需要测速 —— AB引脚已通过外部中断自动计数
-        if (mode & 0x08) {
+        if (mode & 0x10) {
             // 需要转换成100ms的计数或PID
             motor[num].execute(num == 0 && _tunePID);
             currspeed = motor[num]._count100ms;

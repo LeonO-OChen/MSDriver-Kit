@@ -96,7 +96,7 @@ void loop()
 // 4电机开环控制，舵机全开
 void initMSDriver1()
 {
-    uint8_t motorMode = 0b10001000; // 测速，计数自动清零，无PID控制
+    uint8_t motorMode = 0b10010000; // 测速，计数自动清零，无PID控制
     uint8_t smode = 0b11;           // 舵机模式
     _MSDriverMaster.init(0x32);
     _MSDriverMaster.setMotorMode(-1, motorMode); // 设置所有电机M0工作模式
@@ -107,7 +107,7 @@ void initMSDriver1()
 // 闭环控制
 void initMSDriver2()
 {
-    uint8_t motorMode = 0b10001001; // 测速，计数自动清零，PID控制
+    uint8_t motorMode = 0b10010001; // 测速，计数自动清零，PID控制
 
     uint8_t smode = 0b11; // 舵机模式
     _MSDriverMaster.init(0x32);
