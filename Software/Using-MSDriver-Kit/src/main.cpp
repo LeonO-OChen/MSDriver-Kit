@@ -99,7 +99,7 @@ void initMSDriver1()
     uint8_t motorMode = 0b11000000; // 测速，计数自动清零，无PID控制
     uint8_t smode = 0b11;           // 舵机模式
     _MSDriverMaster.init(0x32);
-    _MSDriverMaster.setMotorMode(-1, motorMode); // 设置所有电机M0工作模式
+    _MSDriverMaster.setMotorMode(-1, motorMode); // 设置所有电机工作模式
     _MSDriverMaster.setServoMode(-1, smode);     // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);
 }
@@ -111,7 +111,7 @@ void initMSDriver2()
 
     uint8_t smode = 0b11; // 舵机模式
     _MSDriverMaster.init(0x32);
-    _MSDriverMaster.setMotorMode(-1, motorMode);            // 设置所有电机M0工作模式
+    _MSDriverMaster.setMotorMode(-1, motorMode);            // 设置所有电机工作模式
     _MSDriverMaster.setMotorPID(-1, 0.6, 0.000001, 0, 2.8); // 设置所有电机PID参数
     _MSDriverMaster.setServoMode(-1, smode);                // 设置所有舵机工作模式
     _MSDriverMaster.sendCmd(APPLY);

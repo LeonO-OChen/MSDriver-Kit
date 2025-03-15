@@ -116,9 +116,17 @@ void loop() {
 
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
+            // 等待电机速度归零
             delay(200);
+
             if (_MSDriverSlave._tunePID) {
-                delay(1800);
+                // 等待电机速度归零
+                for (int i = 0; i < 10; i++) {
+                    delay(180);
+                    // 数据归零
+                    Serial.printf("%f 0 0 255 \n", _MSDriverSlave.reg.mode.m0KR * _MSDriverSlave.reg.ctrl.speedM[0]);
+                }
+
                 // 设置发生变更
                 _MSDriverSlave.reg.mode.m0Mode = 0b11000001; // PID控制(电机使能)
                 _MSDriverSlave.reg.cmd = APPLY;
