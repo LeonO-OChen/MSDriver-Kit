@@ -86,7 +86,7 @@ enum MSD_REG_ADDR {
 typedef struct {
     /* 电机工作模式
     s7:测速使能位
-    s3:电机使能位
+    s3:电机禁用位
     0xxx xxxx: 默认 无需测速，相应的AB引脚作为IO口
         0xxx x000: 相应的A脚作为数字输入 INPUT
         0xxx x001: 相应的A脚作为模拟输入 INPUT
@@ -107,10 +107,10 @@ typedef struct {
         0111 xxxx: 相应的B脚作为输出 OUTPUT_OPEN_DRAIN HIGH
 
     1xxx xxxx: 需要测速，AB作为测速中断
-        1xx0 xxxx: 计数不自动清零
-        1xx1 xxxx: 转换成100ms的计数
+        10xx xxxx: 计数不自动清零
+        11xx xxxx: 转换成100ms的计数
         1xxx xxx0: 无PID控制
-        1xx1 xxx1: 需PID控制
+        11xx xxx1: 需PID控制
     */
     uint8_t m0Mode; /* 电机工作模式(M0) */
     uint8_t m1Mode; /* 电机工作模式(M1) */

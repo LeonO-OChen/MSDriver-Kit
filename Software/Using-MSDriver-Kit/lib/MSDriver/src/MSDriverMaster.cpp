@@ -44,10 +44,10 @@ void MSDriverMaster::sendCmd(MSD_CMD cmd)
         0111 xxxx: 相应的B脚作为输出 OUTPUT_OPEN_DRAIN HIGH
 
     1xxx xxxx: 需要测速，AB作为测速中断
-        1xx0 xxxx: 计数不自动清零
-        1xx1 xxxx: 转换成100ms的计数
+        10xx xxxx: 计数不自动清零
+        11xx xxxx: 转换成100ms的计数
         1xxx xxx0: 无PID控制
-        1xx1 xxx1: 需PID控制
+        11xx xxx1: 需PID控制
 */
 void MSDriverMaster::setMotorMode(int num, uint8_t &mode)
 {

@@ -3,8 +3,8 @@
 void PIDMotor::setParam(float kp, float ki, float kd, float kStandradPoint) {
     // PID参数
     _pidCtrl.kp = kp;
-    _pidCtrl.ki = _pidCtrl.ki * _pidCtrl.T;
-    _pidCtrl.kd = _pidCtrl.kd / _pidCtrl.T;
+    _pidCtrl.ki = ki * (_PID_T/10000);
+    _pidCtrl.kd = kd / (_PID_T/10000);
 
     _kStandradPoint = kStandradPoint;
 }
@@ -20,7 +20,7 @@ void PIDMotor::init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2) {
     _pinD1 = pinD1;
     _pinD2 = pinD2;
 
-    _pidCtrl.T = 30000; // 1000=1ms
+    _PID_T = 30000; // 1000=1ms
     _pidCtrl.max = 255;
     _pidCtrl.min = -255;
 
@@ -34,7 +34,7 @@ void PIDMotor::init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2) {
 void PIDMotor::setMotorTar(int16_t speed) {
     bBreak = (speed == 0x0E0E);   // 是否刹车
     bRelease = (speed == 0x0E00); // 是否滑行
-    
+
     if (bRelease) {
         // 滑行
         digitalWrite(_pinD1, LOW);
@@ -97,7 +97,7 @@ void PIDMotor::execute(bool debug) {
         _count = 0;
         _sampleTime = micros();
         return;
-    } else if (dt < _pidCtrl.T) {
+    } else if (dt < _PID_T) {
         // 小于采样周期，跳过PID处理
         return;
     } else {

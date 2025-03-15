@@ -10,7 +10,6 @@ public:
     float kp = 0;
     float ki = 0;
     float kd = 0;
-    float T = 1;      // 采样周期
     float target = 0; // 目标值
     float max = 0;    // 最大控制值
     float min = 0;    // 最小控制值

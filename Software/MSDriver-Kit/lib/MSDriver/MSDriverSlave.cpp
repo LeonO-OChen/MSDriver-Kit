@@ -135,18 +135,13 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
                                void (*interruptFunA)(void),
                                void (*interruptFunB)(void)) {
 
-    if (mode & 0x08 == 0){
-        // 电机无效
-        motor[num].setMotorTar(0x0E00);
-    }
-
     if (mode & 0x80) {
         // 需要测速
         pinMode(pinA, INPUT);
         pinMode(pinB, INPUT);
 
         motor[num].setParam(kp, ki, kd, kR);
-        if (mode & 0b010001 == 0b010001) {
+        if (mode & 0b1000001 == 0b1000001) {
             // PID控制
             motor[num].enablePID(true);
         } else {
@@ -213,10 +208,13 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
                                 int32_t &currspeed, uint8_t pinA,
                                 uint8_t pinB) {
 
-    // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
-    if (shadowRegCtrl.speedM[num] == inSpeed) {
-        if (mode & 0x08){
-            // 电机有效时设置目标速度
+    if (mode & 0x08) {
+        // 禁用电机
+        motor[num].setMotorTar(0x0E00);
+    } else {
+        // 电机有效时设置目标速度
+        // 两次读到相同内容时才改变速度——防止寄存器写到一半就执行
+        if (shadowRegCtrl.speedM[num] == inSpeed) {
             motor[num].setMotorTar(inSpeed);
         }
     }
@@ -224,7 +222,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
 
     if (mode & 0x80) {
         // 需要测速 —— AB引脚已通过外部中断自动计数
-        if (mode & 0x10) {
+        if (mode & 0x40) {
             // 需要转换成100ms的计数或PID
             motor[num].execute(num == 0 && _tunePID);
             currspeed = motor[num]._count100ms;

@@ -116,15 +116,15 @@ void loop() {
 
             // 先停止电机
             _MSDriverSlave.motor[0].setMotorPWM(0);
-            delay(2000);
-
+            delay(200);
             if (_MSDriverSlave._tunePID) {
+                delay(1800);
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b10011001; // PID控制(电机使能)
+                _MSDriverSlave.reg.mode.m0Mode = 0b11000001; // PID控制(电机使能)
                 _MSDriverSlave.reg.cmd = APPLY;
             } else {
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b10010001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.m0Mode = 0b11001001; // PID控制(电机禁用)
                 _MSDriverSlave.reg.cmd = APPLY;
             }
         }
@@ -144,7 +144,7 @@ void serialEvent() {
 }
 
 void printReadme() {
-    Serial.println("4路电机8路舵机控制模块 MSDriver (ver:2.1)");
+    Serial.println("4路电机8路舵机控制模块 MSDriver (ver:2.2)");
     Serial.printf("I2C address: 0x%02X\n", i2cAddr);
     Serial.println("指令格式：REG地址，数据1，数据2，……");
     Serial.println("");

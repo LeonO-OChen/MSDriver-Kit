@@ -7,12 +7,13 @@
 
 class PIDMotor {
 
-  public:
+public:
     KLM_t KLM_data;           // 卡尔曼滤波——使转速计数平缓
     bool bEnabledPID = false; // 默认不进行PID控制
     bool bBreak = false;      // 是否刹车
     bool bRelease = false;    // 是否滑行
     PIDControl _pidCtrl;      // PID控制
+    float _PID_T = 30000;     // PID周期(um)
 
     /*
     转速系数——PID控制时必须设置，用于设置目标转速(目标转速 = 转速系数 * 期望速度百分比)
@@ -40,9 +41,9 @@ class PIDMotor {
     void enablePID(bool enbable);
     void setParam(float kp, float ki, float kd, float kStandradPoint);
     void init(uint8_t pinPWM, uint8_t pinD1, uint8_t pinD2);
-    void setMotorTar(int16_t mspeed);   // 设置电机目标速度 -- mspeed:速度 -255~255
-    void setMotorPWM(int16_t pwm); // 驱动单个电机 -- pwm:速度 -255~255
-    void execute(bool debug); // 如需PID控制，每30ms调用此函数
+    void setMotorTar(int16_t mspeed); // 设置电机目标速度 -- mspeed:速度 -255~255
+    void setMotorPWM(int16_t pwm);    // 驱动单个电机 -- pwm:速度 -255~255
+    void execute(bool debug);         // 如需PID控制，每30ms调用此函数
 };
 
 #endif
