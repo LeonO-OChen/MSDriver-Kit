@@ -86,6 +86,17 @@ void loop() {
             tunePID = !tunePID;
             _MSDriverSlave.motor[motorNum]._tunePID = tunePID;
             break;
+        case 'm':
+            motorNum = inputString.substring(1).toInt();
+            if (motorNum < 0 || motorNum > 3) {
+                motorNum = 0;
+            }
+            _MSDriverSlave.reg.mode.mMode[0] = 0b11001001; // PID控制(电机禁用)
+            _MSDriverSlave.reg.mode.mMode[1] = 0b11001001; // PID控制(电机禁用)
+            _MSDriverSlave.reg.mode.mMode[2] = 0b11001001; // PID控制(电机禁用)
+            _MSDriverSlave.reg.mode.mMode[3] = 0b11001001; // PID控制(电机禁用)
+            _MSDriverSlave.reg.cmd = APPLY;
+            break;
         case 'r':
             kr = inputString.substring(1).toFloat();
             _MSDriverSlave.motor[motorNum].setParam(kp, ki, kd, kr);
@@ -123,7 +134,11 @@ void loop() {
             }
 
             // 先停止电机
-            _MSDriverSlave.motor[motorNum].setMotorPWM(0);
+            _MSDriverSlave.motor[0].setMotorPWM(0);
+            _MSDriverSlave.motor[1].setMotorPWM(0);
+            _MSDriverSlave.motor[2].setMotorPWM(0);
+            _MSDriverSlave.motor[3].setMotorPWM(0);
+            
             // 等待电机速度归零
             delay(200);
 
@@ -136,11 +151,11 @@ void loop() {
                 }
 
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b11000001; // PID控制(电机使能)
+                _MSDriverSlave.reg.mode.mMode[motorNum] = 0b11000001; // PID控制(电机使能)
                 _MSDriverSlave.reg.cmd = APPLY;
             } else {
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.m0Mode = 0b11001001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.mMode[motorNum] = 0b11001001; // PID控制(电机禁用)
                 _MSDriverSlave.reg.cmd = APPLY;
             }
         }

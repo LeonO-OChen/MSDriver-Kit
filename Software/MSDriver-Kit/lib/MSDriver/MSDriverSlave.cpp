@@ -75,13 +75,13 @@ void MSDriverSlave::execute() {
     }
 
     // M0 ~ M3
-    motorAction(0, shadowRegMod.m0Mode, reg.ctrl.speedM[0],
+    motorAction(0, shadowRegMod.mMode[0], reg.ctrl.speedM[0],
                 reg.feedback.currspeedM[0], PIN_M0_A, PIN_M0_B);
-    motorAction(1, shadowRegMod.m1Mode, reg.ctrl.speedM[1],
+    motorAction(1, shadowRegMod.mMode[1], reg.ctrl.speedM[1],
                 reg.feedback.currspeedM[1], PIN_M1_A, PIN_M1_B);
-    motorAction(2, shadowRegMod.m2Mode, reg.ctrl.speedM[2],
+    motorAction(2, shadowRegMod.mMode[2], reg.ctrl.speedM[2],
                 reg.feedback.currspeedM[2], PIN_M2_A, PIN_M2_B);
-    motorAction(3, shadowRegMod.m3Mode, reg.ctrl.speedM[3],
+    motorAction(3, shadowRegMod.mMode[3], reg.ctrl.speedM[3],
                 reg.feedback.currspeedM[3], PIN_M3_A, PIN_M3_B);
 
     // S0 ~ S7
@@ -106,16 +106,16 @@ void MSDriverSlave::execute() {
 void MSDriverSlave::setModeByReg() {
 
     // M0 ~ M3
-    motorSetup(0, shadowRegMod.m0Mode, shadowRegMod.m0Kp, shadowRegMod.m0Ki,
+    motorSetup(0, shadowRegMod.mMode[0], shadowRegMod.m0Kp, shadowRegMod.m0Ki,
                shadowRegMod.m0Kd, shadowRegMod.m0KR, PIN_M0_A, PIN_M0_B,
                ReadM0ASpeed, ReadM0BSpeed);
-    motorSetup(1, shadowRegMod.m1Mode, shadowRegMod.m1Kp, shadowRegMod.m1Ki,
+    motorSetup(1, shadowRegMod.mMode[1], shadowRegMod.m1Kp, shadowRegMod.m1Ki,
                shadowRegMod.m1Kd, shadowRegMod.m1KR, PIN_M1_A, PIN_M1_B,
                ReadM1ASpeed, ReadM1BSpeed);
-    motorSetup(2, shadowRegMod.m2Mode, shadowRegMod.m2Kp, shadowRegMod.m2Ki,
+    motorSetup(2, shadowRegMod.mMode[2], shadowRegMod.m2Kp, shadowRegMod.m2Ki,
                shadowRegMod.m2Kd, shadowRegMod.m2KR, PIN_M2_A, PIN_M2_B,
                ReadM2ASpeed, ReadM2BSpeed);
-    motorSetup(3, shadowRegMod.m3Mode, shadowRegMod.m3Kp, shadowRegMod.m3Ki,
+    motorSetup(3, shadowRegMod.mMode[3], shadowRegMod.m3Kp, shadowRegMod.m3Ki,
                shadowRegMod.m3Kd, shadowRegMod.m3KR, PIN_M3_A, PIN_M3_B,
                ReadM3ASpeed, ReadM3BSpeed);
 
