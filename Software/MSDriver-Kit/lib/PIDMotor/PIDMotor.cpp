@@ -85,7 +85,7 @@ void PIDMotor::setMotorPWM(int16_t pwm) {
     }
 }
 
-void PIDMotor::execute(bool debug) {
+void PIDMotor::execute() {
 
     unsigned long t1 = micros();
     unsigned long dt = t1 - _sampleTime;
@@ -123,7 +123,7 @@ void PIDMotor::execute(bool debug) {
     // 输出
     setMotorPWM(_pidCtrl.control);
 
-    if (debug) {
+    if (_tunePID) {
         Serial.printf("%f %f %f 255 0\n", _pidCtrl.target, _pidCtrl.actual,
                       _pidCtrl.control);
     }

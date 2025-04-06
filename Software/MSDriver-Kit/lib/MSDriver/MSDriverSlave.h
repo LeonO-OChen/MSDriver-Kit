@@ -20,8 +20,6 @@ class MSDriverSlave
 {
     // private:
 public:
-    // PID调参模式
-    bool _tunePID = false;
     // 寄存器
     MSDriverReg_t reg;
     // 影子寄存器——实际使用的寄存器——防止使用过程中被覆盖

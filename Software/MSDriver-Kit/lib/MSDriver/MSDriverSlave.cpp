@@ -224,7 +224,7 @@ void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
         // 需要测速 —— AB引脚已通过外部中断自动计数
         if (mode & 0x40) {
             // 需要转换成100ms的计数或PID
-            motor[num].execute(num == 0 && _tunePID);
+            motor[num].execute();
             currspeed = motor[num]._count100ms;
         } else {
             // 需要测速 保留总数
