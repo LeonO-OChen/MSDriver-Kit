@@ -138,7 +138,7 @@ void loop() {
             _MSDriverSlave.motor[1].setMotorPWM(0);
             _MSDriverSlave.motor[2].setMotorPWM(0);
             _MSDriverSlave.motor[3].setMotorPWM(0);
-            
+
             // 等待电机速度归零
             delay(200);
 
@@ -193,17 +193,17 @@ void printReadme() {
     Serial.println("引脚作为IO口输入:");
     Serial.println("    电机AB脚，或舵机的相应引脚作为输入时，读取相应的反馈寄存器为输入");
     Serial.println("PID调参:");
-    Serial.println("    M0接上编码电机后，使用Arduino IDE，打开串口监视器，波特率115200。");
+    Serial.println("    接上编码电机后，使用Arduino IDE，打开串口监视器，波特率115200。");
     Serial.println("    向模块发送参数名（小写）和参数值，回车后，模块将以此参数对电机进行PID控制，");
     Serial.println("    同时在串口输出目标值、当前值和控制值，在Arduino IDE的\"串口绘图仪\"可观察控制曲线");
     Serial.println("    例：");
     Serial.println("       ?<Enter>     -- 帮助");
     Serial.println("       e<Enter>     -- 开始/停止调参");
     Serial.println("       m0<Enter>    -- 选择0号电机进行调参");
-    Serial.println("       r7<Enter>    -- 设置转速系数");
-    Serial.println("       t20<Enter>   -- 设置目标值");
+    Serial.println("       r2.5<Enter>  -- 设置转速系数");
+    Serial.println("       t180<Enter>  -- 设置目标值（-255~255）");
     Serial.println("       p2<Enter>    -- 设置P参数");
-    Serial.println("       i0.2<Enter>  -- 设置I参数");
-    Serial.println("       d0.4<Enter>  -- 设置D参数");
+    Serial.println("       i0.0002<Enter>  -- 设置I参数");
+    Serial.println("       d10<Enter>  -- 设置D参数");
     Serial.println("开源地址：https://github.com/LeonO-OChen/MSDriver");
 }
