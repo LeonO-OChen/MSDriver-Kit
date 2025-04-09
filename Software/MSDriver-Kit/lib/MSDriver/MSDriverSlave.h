@@ -37,11 +37,11 @@ public:
     // 变更电机的工作模式
     void motorSetup(int num, uint8_t mode, float kp, float ki, float kd, float kR, uint8_t pinA, uint8_t pinB, void (*interruptFunA)(void), void (*interruptFunB)(void));
     // 电机及相关引脚工作
-    void motorAction(int num, uint8_t mode, int16_t &speed, int32_t &currspeed, uint8_t pinA, uint8_t pinB);
+    void motorAction(int num, uint8_t pinA, uint8_t pinB);
     // 变更舵机的工作模式
     void servoSetup(int num, uint8_t pin, uint8_t mode);
     // 舵机及相关引脚工作
-    void servoAction(int num, uint8_t pin, uint8_t mode, uint8_t angle, uint16_t &currValue);
+    void servoAction(int num, uint8_t pin, uint8_t mode);
 
 public:
     // 初始化

@@ -75,32 +75,20 @@ void MSDriverSlave::execute() {
     }
 
     // M0 ~ M3
-    motorAction(0, shadowRegMod.mMode[0], reg.ctrl.speedM[0],
-                reg.feedback.currspeedM[0], PIN_M0_A, PIN_M0_B);
-    motorAction(1, shadowRegMod.mMode[1], reg.ctrl.speedM[1],
-                reg.feedback.currspeedM[1], PIN_M1_A, PIN_M1_B);
-    motorAction(2, shadowRegMod.mMode[2], reg.ctrl.speedM[2],
-                reg.feedback.currspeedM[2], PIN_M2_A, PIN_M2_B);
-    motorAction(3, shadowRegMod.mMode[3], reg.ctrl.speedM[3],
-                reg.feedback.currspeedM[3], PIN_M3_A, PIN_M3_B);
+    motorAction(0, PIN_M0_A, PIN_M0_B);
+    motorAction(1, PIN_M1_A, PIN_M1_B);
+    motorAction(2, PIN_M2_A, PIN_M2_B);
+    motorAction(3, PIN_M3_A, PIN_M3_B);
 
     // S0 ~ S7
-    servoAction(0, PIN_S0, shadowRegMod.smode0123, reg.ctrl.angleS[0],
-                reg.feedback.currValueS[0]);
-    servoAction(1, PIN_S1, shadowRegMod.smode0123 >> 2, reg.ctrl.angleS[1],
-                reg.feedback.currValueS[1]);
-    servoAction(2, PIN_S2, shadowRegMod.smode0123 >> 4, reg.ctrl.angleS[2],
-                reg.feedback.currValueS[2]);
-    servoAction(3, PIN_S3, shadowRegMod.smode0123 >> 6, reg.ctrl.angleS[3],
-                reg.feedback.currValueS[3]);
-    servoAction(4, PIN_S4, shadowRegMod.smode4567, reg.ctrl.angleS[4],
-                reg.feedback.currValueS[4]);
-    servoAction(5, PIN_S5, shadowRegMod.smode4567 >> 2, reg.ctrl.angleS[5],
-                reg.feedback.currValueS[5]);
-    servoAction(6, PIN_S6, shadowRegMod.smode4567 >> 4, reg.ctrl.angleS[6],
-                reg.feedback.currValueS[6]);
-    servoAction(7, PIN_S7, shadowRegMod.smode4567 >> 6, reg.ctrl.angleS[7],
-                reg.feedback.currValueS[7]);
+    servoAction(0, PIN_S0, shadowRegMod.smode0123);
+    servoAction(1, PIN_S1, shadowRegMod.smode0123 >> 2);
+    servoAction(2, PIN_S2, shadowRegMod.smode0123 >> 4);
+    servoAction(3, PIN_S3, shadowRegMod.smode0123 >> 6);
+    servoAction(4, PIN_S4, shadowRegMod.smode4567);
+    servoAction(5, PIN_S5, shadowRegMod.smode4567 >> 2);
+    servoAction(6, PIN_S6, shadowRegMod.smode4567 >> 4);
+    servoAction(7, PIN_S7, shadowRegMod.smode4567 >> 6);
 }
 
 void MSDriverSlave::setModeByReg() {
@@ -204,9 +192,11 @@ void MSDriverSlave::motorSetup(int num, uint8_t mode, float kp, float ki,
     }
 }
 
-void MSDriverSlave::motorAction(int num, uint8_t mode, int16_t &inSpeed,
-                                int32_t &currspeed, uint8_t pinA,
-                                uint8_t pinB) {
+void MSDriverSlave::motorAction(int num, uint8_t pinA, uint8_t pinB) {
+
+    uint8_t mode = shadowRegMod.mMode[num];
+    int16_t inSpeed = reg.ctrl.speedM[num];
+    int32_t &currspeed = reg.feedback.currspeedM[num];
 
     if (mode & 0x08) {
         // 禁用电机
@@ -289,8 +279,11 @@ void MSDriverSlave::servoSetup(int num, uint8_t pin, uint8_t mode) {
     }
 }
 
-void MSDriverSlave::servoAction(int num, uint8_t pin, uint8_t mode,
-                                uint8_t angle, uint16_t &currValue) {
+void MSDriverSlave::servoAction(int num, uint8_t pin, uint8_t mode) {
+
+    uint8_t angle = reg.ctrl.angleS[num];
+    uint16_t &currValue = reg.feedback.currValueS[num];
+
     switch (mode & 0b0011) {
     case 0b001:
         // OUTPUT 高低电平

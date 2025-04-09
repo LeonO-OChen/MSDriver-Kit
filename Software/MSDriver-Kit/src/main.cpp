@@ -99,22 +99,74 @@ void loop() {
             break;
         case 'r':
             kr = inputString.substring(1).toFloat();
-            _MSDriverSlave.motor[motorNum].setParam(kp, ki, kd, kr);
+            switch (motorNum) {
+            case 0:
+                _MSDriverSlave.reg.mode.m0KR = kr;
+                break;
+            case 1:
+                _MSDriverSlave.reg.mode.m1KR = kr;
+                break;
+            case 2:
+                _MSDriverSlave.reg.mode.m2KR = kr;
+                break;
+            case 3:
+                _MSDriverSlave.reg.mode.m3KR = kr;
+                break;
+            }
             break;
         case 't':
             _MSDriverSlave.reg.ctrl.speedM[motorNum] = inputString.substring(1).toInt();
             break;
         case 'p':
             kp = inputString.substring(1).toFloat();
-            _MSDriverSlave.motor[motorNum].setParam(kp, ki, kd, kr);
+            switch (motorNum) {
+            case 0:
+                _MSDriverSlave.reg.mode.m0Kp = kp;
+                break;
+            case 1:
+                _MSDriverSlave.reg.mode.m1Kp = kp;
+                break;
+            case 2:
+                _MSDriverSlave.reg.mode.m2Kp = kp;
+                break;
+            case 3:
+                _MSDriverSlave.reg.mode.m3Kp = kp;
+                break;
+            }
             break;
         case 'i':
             ki = inputString.substring(1).toFloat();
-            _MSDriverSlave.motor[motorNum].setParam(kp, ki, kd, kr);
+            switch (motorNum) {
+            case 0:
+                _MSDriverSlave.reg.mode.m0Ki = ki;
+                break;
+            case 1:
+                _MSDriverSlave.reg.mode.m1Ki = ki;
+                break;
+            case 2:
+                _MSDriverSlave.reg.mode.m2Ki = ki;
+                break;
+            case 3:
+                _MSDriverSlave.reg.mode.m3Ki = ki;
+                break;
+            }
             break;
         case 'd':
             kd = inputString.substring(1).toFloat();
-            _MSDriverSlave.motor[motorNum].setParam(kp, ki, kd, kr);
+            switch (motorNum) {
+            case 0:
+                _MSDriverSlave.reg.mode.m0Kd = kd;
+                break;
+            case 1:
+                _MSDriverSlave.reg.mode.m1Kd = kd;
+                break;
+            case 2:
+                _MSDriverSlave.reg.mode.m2Kd = kd;
+                break;
+            case 3:
+                _MSDriverSlave.reg.mode.m3Kd = kd;
+                break;
+            }
             break;
         default:
             isChanged = false;
