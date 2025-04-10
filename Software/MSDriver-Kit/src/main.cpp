@@ -96,6 +96,33 @@ void loop() {
             _MSDriverSlave.reg.mode.mMode[2] = 0b11001001; // PID控制(电机禁用)
             _MSDriverSlave.reg.mode.mMode[3] = 0b11001001; // PID控制(电机禁用)
             _MSDriverSlave.reg.cmd = APPLY;
+
+            switch (motorNum) {
+            case 0:
+                kp = _MSDriverSlave.reg.mode.m0Kp;
+                ki = _MSDriverSlave.reg.mode.m0Ki;
+                kd = _MSDriverSlave.reg.mode.m0Kd;
+                kr = _MSDriverSlave.reg.mode.m0KR;
+                break;
+            case 1:
+                kp = _MSDriverSlave.reg.mode.m1Kp;
+                ki = _MSDriverSlave.reg.mode.m1Ki;
+                kd = _MSDriverSlave.reg.mode.m1Kd;
+                kr = _MSDriverSlave.reg.mode.m1KR;
+                break;
+            case 2:
+                kp = _MSDriverSlave.reg.mode.m2Kp;
+                ki = _MSDriverSlave.reg.mode.m2Ki;
+                kd = _MSDriverSlave.reg.mode.m2Kd;
+                kr = _MSDriverSlave.reg.mode.m2KR;
+                break;
+            case 3:
+                kp = _MSDriverSlave.reg.mode.m3Kp;
+                ki = _MSDriverSlave.reg.mode.m3Ki;
+                kd = _MSDriverSlave.reg.mode.m3Kd;
+                kr = _MSDriverSlave.reg.mode.m3KR;
+                break;
+            }
             break;
         case 'r':
             kr = inputString.substring(1).toFloat();
@@ -175,6 +202,7 @@ void loop() {
         inputString = "";
         stringComplete = false;
 
+        Serial.printf("M%d:\n", motorNum);
         Serial.printf("转速系数(r): %f 目标速度(t): %d \n", kr, _MSDriverSlave.reg.ctrl.speedM[motorNum]);
         Serial.printf("kp: %f ki: %f kd : %f\n", kp, ki, kd);
 
