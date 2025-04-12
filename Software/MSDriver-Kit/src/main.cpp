@@ -235,7 +235,10 @@ void loop() {
                 _MSDriverSlave.reg.cmd = APPLY;
             } else {
                 // 设置发生变更
-                _MSDriverSlave.reg.mode.mMode[motorNum] = 0b11001001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.mMode[0] = 0b11001001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.mMode[1] = 0b11001001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.mMode[2] = 0b11001001; // PID控制(电机禁用)
+                _MSDriverSlave.reg.mode.mMode[3] = 0b11001001; // PID控制(电机禁用)
                 _MSDriverSlave.reg.cmd = APPLY;
             }
         }
